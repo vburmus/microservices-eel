@@ -1,2 +1,4 @@
 rootProject.name = 'microservices-eel'
 include 'eureka-server', 'api-gateway'
+include 'aws-utils'
+
