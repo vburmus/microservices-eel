@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: aws-utils
+logging:
+  level:
+    root: debug
+server:
+  port: 8090
+aws:
+  access: ${AWS_ACCESS}
+  secret: ${AWS_SECRET}
+  content:
+    bucket:
+      name: ${AWS_CONTENT_BUCKET}
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
