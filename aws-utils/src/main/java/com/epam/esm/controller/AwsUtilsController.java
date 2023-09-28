@@ -1,4 +1,4 @@
-package com.epam.esm.exceptionhandler.controller;
+package com.epam.esm.controller;
 
 import com.epam.esm.service.AwsUtilsService;
 import lombok.RequiredArgsConstructor;

@@ -5,7 +5,7 @@ logging:
   level:
     root: debug
 server:
-  port: 8090
+  port: 0
 aws:
   access: ${AWS_ACCESS}
   secret: ${AWS_SECRET}
