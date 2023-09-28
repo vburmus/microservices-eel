@@ -1,7 +1,7 @@
 package com.epam.esm.utils;
 
-import com.epam.esm.exceptionhandler.exceptions.InvalidFileException;
-import com.epam.esm.exceptionhandler.exceptions.NullableFileException;
+import com.epam.esm.utils.exceptionhandler.exceptions.InvalidFileException;
+import com.epam.esm.utils.exceptionhandler.exceptions.NullableFileException;
 import lombok.experimental.UtilityClass;
 import org.springframework.web.multipart.MultipartFile;
 
