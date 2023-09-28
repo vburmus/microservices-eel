@@ -13,5 +13,4 @@ public class Constants {
     public static final String INVALID_FILE_CHECK_EXTENSION = "Invalid file, check extension";
     public static final String FILE_CAN_T_BE_NULL = "File can't be null";
     public static final String DIRECTORY_SWAGGER_DESCRIPTION = "Name of directory in AWS S3 bucket, without / ";
-
 }
