@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: commerce-service
+  datasource:
+    username: ${SQL_USERNAME}
+    url: jdbc:postgresql://localhost:5432/commerce
+    password: ${SQL_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: 'true'
+        show_sql: 'true'
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 5000
+            readTimeout: 5000
+            loggerLevel: basic
+  logging:
+    level:
+      root: debug
+server:
+  port: 8081
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
