@@ -1,8 +1,8 @@
-package com.epam.esm.exceptionhandler;
+package com.epam.esm.utils.exceptionhandler;
 
-import com.epam.esm.exceptionhandler.exceptions.FileUploadException;
-import com.epam.esm.exceptionhandler.exceptions.InvalidFileException;
-import com.epam.esm.exceptionhandler.exceptions.NullableFileException;
+import com.epam.esm.utils.exceptionhandler.exceptions.FileUploadException;
+import com.epam.esm.utils.exceptionhandler.exceptions.InvalidFileException;
+import com.epam.esm.utils.exceptionhandler.exceptions.NullableFileException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;

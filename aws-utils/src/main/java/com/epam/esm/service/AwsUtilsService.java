@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.epam.esm.exceptionhandler.exceptions.FileUploadException;
+import com.epam.esm.utils.exceptionhandler.exceptions.FileUploadException;
 import com.epam.esm.utils.Validation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Value;
