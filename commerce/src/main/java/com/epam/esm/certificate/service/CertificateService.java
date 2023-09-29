@@ -7,9 +7,7 @@ import com.epam.esm.tag.models.Tag;
 import com.epam.esm.tag.service.TagService;
 import com.epam.esm.utils.EntityToDtoMapper;
 import com.epam.esm.utils.Validation;
-import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchObjectException;
-import com.epam.esm.utils.exceptionhandler.exceptions.ObjectAlreadyExists;
-import com.epam.esm.utils.exceptionhandler.exceptions.ObjectInvalidException;
+import com.epam.esm.utils.exceptionhandler.exceptions.*;
 import com.epam.esm.utils.openfeign.AwsUtilsFeignClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,14 +28,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.epam.esm.utils.Constants.TAGS;
-import static com.epam.esm.utils.Constants.TAG_DOESNT_EXIST_ID;
+import static com.epam.esm.utils.Constants.*;
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.exact;
 
 @Service
 @RequiredArgsConstructor
 public class CertificateService {
-    public static final String UPDATE_CERTIFICATE_IS_NULL = "Error updating certificate. Updated certificate is null.";
     private final CertificateRepository certificateRepository;
     private final EntityToDtoMapper entityToDtoMapper;
     private final AwsUtilsFeignClient awsClient;

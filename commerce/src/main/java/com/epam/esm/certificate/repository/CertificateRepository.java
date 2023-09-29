@@ -17,7 +17,8 @@ public interface CertificateRepository extends JpaRepository<Certificate, Long> 
     Page<Certificate> findByPartialNameOrDescription(@Param("partialNameOrShortDescription") String partialNameOrShortDescription, Pageable pageable);
 
     Page<Certificate> findByTagsIdIn(List<Long> tags, Pageable pageable);
+
     @Query(nativeQuery = true, value = GET_GC_BY_TAGS_AND_PART)
-    Page<Certificate> findByTagsIdInAndShortDescriptionOrNameContaining(List<Long> tags,String partial,
-                                                                            Pageable pageable);
+    Page<Certificate> findByTagsIdInAndShortDescriptionOrNameContaining(@Param("tags") List<Long> tags, @Param(
+            "partial") String partial, Pageable pageable);
 }
