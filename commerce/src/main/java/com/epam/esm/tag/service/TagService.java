@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.epam.esm.utils.Constants.*;
@@ -33,10 +35,6 @@ public class TagService {
     @Value("${default.image.url}")
     private String defaultImageUrl;
 
-    public Page<TagDTO> getAllTags(Pageable pageable) {
-        return tagRepository.findAll(pageable).map(entityToDtoMapper::toTagDTO);
-    }
-
     @Transactional
     public TagDTO createTag(TagDTO tagDTO, Optional<MultipartFile> image) {
         Tag tag = entityToDtoMapper.toTag(tagDTO);
@@ -50,10 +48,18 @@ public class TagService {
         return entityToDtoMapper.toTagDTO(tagRepository.save(tag));
     }
 
+    public Page<TagDTO> getAllTags(Pageable pageable) {
+        return tagRepository.findAll(pageable).map(entityToDtoMapper::toTagDTO);
+    }
+
     public TagDTO getTagById(long id) {
         return tagRepository.findById(id)
                 .map(entityToDtoMapper::toTagDTO)
                 .orElseThrow(() -> new NoSuchObjectException(String.format(TAG_DOESNT_EXIST_ID, id)));
+    }
+
+    public Page<TagDTO> getTagByNamePart(String namePart, Pageable pageable) {
+        return tagRepository.getTagsByNameContaining(namePart, pageable).map(entityToDtoMapper::toTagDTO);
     }
 
     public void deleteTag(long id) {

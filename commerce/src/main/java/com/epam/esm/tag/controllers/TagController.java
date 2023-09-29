@@ -20,17 +20,17 @@ import java.util.Optional;
 public class TagController {
     private final TagService tagService;
 
-    @GetMapping
-    public ResponseEntity<Page<TagDTO>> readAllTags(
-            @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(tagService.getAllTags(pageable));
-    }
-
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<TagDTO> createTag(@RequestPart("tag") TagDTO tagDTO,
-                                            @RequestParam Optional<MultipartFile> image) {
+    public ResponseEntity<TagDTO> create(@RequestPart("tag") TagDTO tagDTO,
+                                         @RequestParam Optional<MultipartFile> image) {
         TagDTO createdTag = tagService.createTag(tagDTO, image);
         return ResponseEntity.created(URI.create("/api/v1/tags/" + createdTag.id())).body(createdTag);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<TagDTO>> readAll(
+            @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(tagService.getAllTags(pageable));
     }
 
     @GetMapping("/{id}")
