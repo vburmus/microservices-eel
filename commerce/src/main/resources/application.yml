@@ -5,6 +5,10 @@ spring:
     username: ${SQL_USERNAME}
     url: jdbc:postgresql://localhost:5432/commerce
     password: ${SQL_PASSWORD}
+  data:
+    web:
+      pageable:
+        default-page-size: 10
   jpa:
     hibernate:
       ddl-auto: none
@@ -21,11 +25,11 @@ spring:
             connectTimeout: 5000
             readTimeout: 5000
             loggerLevel: basic
-  logging:
-    level:
-      root: debug
+logging:
+  level:
+    root: info
 server:
-  port: 8081
+  port: 0
 eureka:
   client:
     serviceUrl:
