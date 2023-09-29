@@ -13,7 +13,7 @@ public class AwsUtilsController {
 
     @PostMapping("/upload-image")
     public String handleFileUpload(@RequestPart String directory,
-                                   @RequestParam MultipartFile image) {
+                                   @RequestPart MultipartFile image) {
         return awsUtilsService.loadImage(directory, image);
     }
 }

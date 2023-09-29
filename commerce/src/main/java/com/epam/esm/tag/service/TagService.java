@@ -6,9 +6,9 @@ import com.epam.esm.tag.models.TagDTO;
 import com.epam.esm.tag.repository.TagRepository;
 import com.epam.esm.utils.EntityToDtoMapper;
 import com.epam.esm.utils.Validation;
-import com.epam.esm.utils.exceptionhandler.exceptions.InvalidTagException;
-import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchTagException;
-import com.epam.esm.utils.exceptionhandler.exceptions.TagAlreadyExistsException;
+import com.epam.esm.utils.exceptionhandler.exceptions.ObjectInvalidException;
+import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchObjectException;
+import com.epam.esm.utils.exceptionhandler.exceptions.ObjectAlreadyExists;
 import com.epam.esm.utils.openfeign.AwsUtilsFeignClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.epam.esm.utils.Constants.*;
@@ -30,19 +32,15 @@ public class TagService {
     private final TagRepository tagRepository;
     private final EntityToDtoMapper entityToDtoMapper;
     private final AwsUtilsFeignClient awsClient;
-    @Value("${default.image.url}")
+    @Value("${tag.default.image.url}")
     private String defaultImageUrl;
-
-    public Page<TagDTO> getAllTags(Pageable pageable) {
-        return tagRepository.findAll(pageable).map(entityToDtoMapper::toTagDTO);
-    }
 
     @Transactional
     public TagDTO createTag(TagDTO tagDTO, Optional<MultipartFile> image) {
         Tag tag = entityToDtoMapper.toTag(tagDTO);
         if (tagRepository.exists(Example.of(tag)))
-            throw new TagAlreadyExistsException(String.format(TAG_ALREADY_EXISTS, tag.getName()));
-        if (!Validation.isTagValid(tag)) throw new InvalidTagException(String.format(TAG_IS_INVALID, tag.getName()));
+            throw new ObjectAlreadyExists(String.format(TAG_ALREADY_EXISTS, tag.getName()));
+        if (!Validation.isTagValid(tag)) throw new ObjectInvalidException(String.format(TAG_IS_INVALID, tag.getName()));
         image.ifPresentOrElse(
                 img -> tag.setImageUrl(awsClient.uploadImage(TAGS, img)),
                 () -> tag.setImageUrl(defaultImageUrl)
@@ -50,10 +48,18 @@ public class TagService {
         return entityToDtoMapper.toTagDTO(tagRepository.save(tag));
     }
 
+    public Page<TagDTO> getAllTags(Pageable pageable) {
+        return tagRepository.findAll(pageable).map(entityToDtoMapper::toTagDTO);
+    }
+
     public TagDTO getTagById(long id) {
         return tagRepository.findById(id)
                 .map(entityToDtoMapper::toTagDTO)
-                .orElseThrow(() -> new NoSuchTagException(String.format(TAG_DOESNT_EXIST_ID, id)));
+                .orElseThrow(() -> new NoSuchObjectException(String.format(TAG_DOESNT_EXIST_ID, id)));
+    }
+
+    public Page<TagDTO> getTagByNamePart(String namePart, Pageable pageable) {
+        return tagRepository.getTagsByNameContaining(namePart, pageable).map(entityToDtoMapper::toTagDTO);
     }
 
     public void deleteTag(long id) {
@@ -61,12 +67,22 @@ public class TagService {
                 .ifPresentOrElse(
                         tag -> tagRepository.deleteById(id),
                         () -> {
-                            throw new NoSuchTagException(String.format(TAG_DOESNT_EXIST_ID, id));
+                            throw new NoSuchObjectException(String.format(TAG_DOESNT_EXIST_ID, id));
                         }
                 );
     }
 
-    public Page<TagDTO> getTagByNamePart(String namePart, Pageable pageable) {
-        return tagRepository.getTagsByNameContaining(namePart, pageable).map(entityToDtoMapper::toTagDTO);
+    public List<Tag> checkTagsAndFetch(List<Tag> tags) {
+        List<Tag> fetchedTags = new ArrayList<>();
+        for (Tag tag : tags) {
+            fetchedTags.add(getTagByExample(tag));
+        }
+        return fetchedTags;
+    }
+
+    private Tag getTagByExample(Tag tag) {
+        Optional<Tag> existingTag = tagRepository.findOne(Example.of(tag));
+        return existingTag.orElseThrow(() -> new NoSuchObjectException(String.format(TAG_DOESNT_EXIST_NAME,
+                tag.getName())));
     }
 }

@@ -29,6 +29,7 @@ subprojects {
             dependency 'org.postgresql:postgresql:42.6.0'
             dependency 'com.google.code.gson:gson:2.10.1'
             dependency 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
+            dependency 'com.github.java-json-tools:json-patch:1.13'
         }
         imports {
             mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2022.0.3'

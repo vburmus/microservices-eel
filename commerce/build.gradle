@@ -14,4 +14,5 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui'
     implementation 'org.mapstruct:mapstruct'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
+    implementation 'com.github.java-json-tools:json-patch'
 }
