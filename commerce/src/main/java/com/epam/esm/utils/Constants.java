@@ -23,7 +23,6 @@ public class Constants {
     public static final String CERTIFICATE_DOES_NOT_EXISTS_ID = "Gift certificate with id %d " +
             "doesn't exist";
     public static final String CREATE_DATE = "create_date";
-    public static final String DATE = "date";
     public static final String LAST_UPDATE = "last_update_date";
     public static final String ID = "id";
     public static final String PRICE = "price";
@@ -35,13 +34,13 @@ public class Constants {
     public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
     public static final String CERTIFICATE_SHOULD_HAVE_AT_LEAST_ONE_TAG = "Certificate should have at least one tag.";
     public static final String TAG_DOESNT_EXIST_NAME = "Tag with name %s doesn't exist";
-    public static final String GET_GC_BY_TAGS_AND_PART = "SELECT DISTINCT id,name,short_description,long_description," +
-            "price," +
-            "imageurl,duration_date," +
-            "create_date,last_update_date FROM " +
-            "gift_certificate AS gc LEFT JOIN gift_certificate_has_tag AS t ON gc.id= " +
-            "t.gift_certificate_id WHERE tag_id IN :tags and " +
-            "(short_description LIKE %:partial% OR name LIKE  %:partial%)";
+    public static final String UPDATE_CERTIFICATE_IS_NULL = "Error updating certificate. Updated certificate is null.";
+    public static final String GET_GC_BY_TAGS_AND_PART =
+            "SELECT DISTINCT id,name,short_description,long_description,price,image_url, duration_date," +
+                    "create_date,last_update_date FROM " +
+                    "Certificate AS c JOIN certificate_tags AS t ON c.id=" +
+                    "t.certificate_id WHERE tag_id IN :tags AND" +
+                    "(short_description LIKE '%' || :partial || '%' OR name LIKE '%' || :partial || '%')";
     public static final String QUERY_FIND_BY_PART_NAME_OR_DESCRIPTION = "SELECT c FROM Certificate c WHERE c.name " +
             "LIKE %:partialNameOrShortDescription% OR c.shortDescription LIKE %:partialNameOrShortDescription%";
 
