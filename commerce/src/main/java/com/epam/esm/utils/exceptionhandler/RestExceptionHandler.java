@@ -28,20 +28,20 @@ public class RestExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }
 
-    @ExceptionHandler(NoSuchTagException.class)
-    public ResponseEntity<Problem> handleCertificateAlreadyExistException(NoSuchTagException e) {
+    @ExceptionHandler(NoSuchObjectException.class)
+    public ResponseEntity<Problem> handleCertificateAlreadyExistException(NoSuchObjectException e) {
         Problem problem = buildProblem(Status.NOT_FOUND, NO_SUCH_ITEM_ERROR, e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
     }
 
-    @ExceptionHandler(TagAlreadyExistsException.class)
-    public ResponseEntity<Problem> handleTagAlreadyExistsException(TagAlreadyExistsException e) {
+    @ExceptionHandler(ObjectAlreadyExists.class)
+    public ResponseEntity<Problem> handleTagAlreadyExistsException(ObjectAlreadyExists e) {
         Problem problem = buildProblem(Status.CONFLICT, ALREADY_EXIST_ERROR, e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
     }
 
-    @ExceptionHandler(InvalidTagException.class)
-    public ResponseEntity<Problem> handleInvalidTagException(InvalidTagException e) {
+    @ExceptionHandler({ObjectInvalidException.class, NullableTagsException.class})
+    public ResponseEntity<Problem> handleInvalidObjectException(ObjectInvalidException e) {
         Problem problem = buildProblem(Status.BAD_REQUEST, INVALID_ITEM_ERROR, e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
