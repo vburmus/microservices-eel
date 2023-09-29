@@ -3,6 +3,7 @@ package com.epam.esm.utils.exceptionhandler;
 import com.epam.esm.utils.exceptionhandler.exceptions.*;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -43,6 +44,18 @@ public class RestExceptionHandler {
     @ExceptionHandler({ObjectInvalidException.class, NullableTagsException.class})
     public ResponseEntity<Problem> handleInvalidObjectException(ObjectInvalidException e) {
         Problem problem = buildProblem(Status.BAD_REQUEST, INVALID_ITEM_ERROR, e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<Problem> handlePropertyReferenceException(PropertyReferenceException e) {
+        Problem problem = buildProblem(Status.BAD_REQUEST, SORT_PARAMETER_ERROR, e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
+    }
+
+    @ExceptionHandler(CertificateUpdateException.class)
+    public ResponseEntity<Problem> handleCertificateUpdateException(CertificateUpdateException e) {
+        Problem problem = buildProblem(Status.BAD_REQUEST, UPDATE_ERROR, e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
