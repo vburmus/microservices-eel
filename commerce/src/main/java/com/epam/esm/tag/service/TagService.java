@@ -32,7 +32,7 @@ public class TagService {
     private final TagRepository tagRepository;
     private final EntityToDtoMapper entityToDtoMapper;
     private final AwsUtilsFeignClient awsClient;
-    @Value("${default.image.url}")
+    @Value("${tag.default.image.url}")
     private String defaultImageUrl;
 
     @Transactional
@@ -72,7 +72,17 @@ public class TagService {
                 );
     }
 
-    public Page<TagDTO> getTagByNamePart(String namePart, Pageable pageable) {
-        return tagRepository.getTagsByNameContaining(namePart, pageable).map(entityToDtoMapper::toTagDTO);
+    public List<Tag> checkTagsAndFetch(List<Tag> tags) {
+        List<Tag> fetchedTags = new ArrayList<>();
+        for (Tag tag : tags) {
+            fetchedTags.add(getTagByExample(tag));
+        }
+        return fetchedTags;
+    }
+
+    private Tag getTagByExample(Tag tag) {
+        Optional<Tag> existingTag = tagRepository.findOne(Example.of(tag));
+        return existingTag.orElseThrow(() -> new NoSuchObjectException(String.format(TAG_DOESNT_EXIST_NAME,
+                tag.getName())));
     }
 }
