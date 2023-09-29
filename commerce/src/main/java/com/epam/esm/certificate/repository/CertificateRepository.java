@@ -6,12 +6,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 import static com.epam.esm.utils.Constants.GET_GC_BY_TAGS_AND_PART;
 import static com.epam.esm.utils.Constants.QUERY_FIND_BY_PART_NAME_OR_DESCRIPTION;
 
+@Repository
 public interface CertificateRepository extends JpaRepository<Certificate, Long> {
     @Query(QUERY_FIND_BY_PART_NAME_OR_DESCRIPTION)
     Page<Certificate> findByPartialNameOrDescription(@Param("partialNameOrShortDescription") String partialNameOrShortDescription, Pageable pageable);
@@ -19,6 +21,6 @@ public interface CertificateRepository extends JpaRepository<Certificate, Long> 
     Page<Certificate> findByTagsIdIn(List<Long> tags, Pageable pageable);
 
     @Query(nativeQuery = true, value = GET_GC_BY_TAGS_AND_PART)
-    Page<Certificate> findByTagsIdInAndShortDescriptionOrNameContaining(List<Long> tags, String partial,
-                                                                        Pageable pageable);
+    Page<Certificate> findByTagsIdInAndShortDescriptionOrNameContaining(@Param("tags") List<Long> tags, @Param(
+            "partial") String partial, Pageable pageable);
 }
