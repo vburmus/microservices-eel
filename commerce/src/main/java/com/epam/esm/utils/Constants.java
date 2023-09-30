@@ -9,6 +9,7 @@ public class Constants {
     public static final String ALREADY_EXIST_ERROR = "Already Exist Error";
     public static final String INVALID_ITEM_ERROR = "Invalid Item Error";
     public static final String UPDATE_ERROR = "Update Error";
+    public static final String PURCHASE_ERROR = "Purchase Error";
     public static final String NO_SUCH_ITEM_ERROR = "No Such Item Error";
     public static final String ERROR_WHILE_MAKING_API_CALL_TO = "Error while making API call to: ";
     public static final String AN_INTERNAL_SERVER_ERROR_OCCURRED_WHILE_PROCESSING_THE_REQUEST = "An internal server " +
@@ -18,9 +19,9 @@ public class Constants {
     public static final String TAG_DOESNT_EXIST_ID = "Tag with id %d doesn't exist";
     public static final String TAG_IS_INVALID = "Tag with name %s is invalid";
     public static final String TAGS = "tags";
-    public static final String CERTIFICATE_IS_INVALID = "Gift certificate with name %s and duration %s is invalid";
-    public static final String CERTIFICATE_EXISTS = "Gift certificate with name %s and duration %s exist";
-    public static final String CERTIFICATE_DOES_NOT_EXISTS_ID = "Gift certificate with id %d " +
+    public static final String CERTIFICATE_IS_INVALID = "Certificate with name %s and duration %s is invalid";
+    public static final String CERTIFICATE_EXISTS = "Certificate with name %s and duration %s exist";
+    public static final String CERTIFICATE_DOES_NOT_EXISTS_ID = "Certificate with id %d " +
             "doesn't exist";
     public static final String CREATE_DATE = "create_date";
     public static final String LAST_UPDATE = "last_update_date";
@@ -43,5 +44,7 @@ public class Constants {
                     "(short_description LIKE '%' || :partial || '%' OR name LIKE '%' || :partial || '%')";
     public static final String QUERY_FIND_BY_PART_NAME_OR_DESCRIPTION = "SELECT c FROM Certificate c WHERE c.name " +
             "LIKE %:partialNameOrShortDescription% OR c.shortDescription LIKE %:partialNameOrShortDescription%";
-
+    public static final String PURCHASE_DOES_NOT_EXISTS_ID = "Purchase with id %d " +
+            "doesn't exist";
+    public static final String WRONG_POSITION_PURCHASE = "Wrong position arguments, please check your purchase items";
 }
