@@ -58,6 +58,11 @@ public class RestExceptionHandler {
         Problem problem = buildProblem(Status.BAD_REQUEST, UPDATE_ERROR, e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
+    @ExceptionHandler(PurchasePositionException.class)
+    public ResponseEntity<Problem> handlePurchasePositionException(PurchasePositionException e) {
+        Problem problem = buildProblem(Status.BAD_REQUEST, PURCHASE_ERROR, e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
+    }
 
     private Problem buildProblem(Status status, String title, String detail) {
         return Problem.builder()
