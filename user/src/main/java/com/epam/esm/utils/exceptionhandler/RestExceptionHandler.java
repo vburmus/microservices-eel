@@ -60,7 +60,6 @@ public class RestExceptionHandler {
     public ResponseEntity<Problem> handlePropertyReferenceException(PropertyReferenceException e) {
         Problem problem = buildProblem(Status.BAD_REQUEST, SORT_PARAMETER_ERROR, e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
-
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
