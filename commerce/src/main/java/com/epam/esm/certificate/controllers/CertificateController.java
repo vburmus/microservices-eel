@@ -6,6 +6,7 @@ import com.epam.esm.certificate.service.CertificateService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,9 +26,14 @@ public class CertificateController {
     public final CertificateService giftCertificateService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CertificateDTO> create(@RequestPart("certificate") CertificateDTO certificateDTO,
+    public ResponseEntity<CertificateDTO> create(@Valid @RequestPart("certificate") CertificateDTO certificateDTO,
                                                  @RequestPart("image") Optional<MultipartFile> image) {
         return ResponseEntity.ok(giftCertificateService.create(certificateDTO, image));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<CertificateDTO>> readAll(@PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(giftCertificateService.readAll(pageable));
     }
 
     @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -36,11 +42,6 @@ public class CertificateController {
             @RequestPart(value = "patch") JsonMergePatch patch,
             @RequestPart(value = "image") Optional<MultipartFile> image) throws JsonPatchException, JsonProcessingException {
         return ResponseEntity.ok(giftCertificateService.updateCertificate(id, patch, image));
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<CertificateDTO>> readAll(@PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(giftCertificateService.readAll(pageable));
     }
 
     @GetMapping("/{id}")

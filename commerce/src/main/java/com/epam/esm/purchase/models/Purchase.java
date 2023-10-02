@@ -1,7 +1,6 @@
 package com.epam.esm.purchase.models;
 
 import com.epam.esm.purchasecertificate.model.PurchaseCertificate;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -26,11 +25,8 @@ import java.util.Set;
 public class Purchase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ToString.Exclude
     private Long id;
-    @ToString.Exclude
     private String description;
-    @ToString.Exclude
     private BigDecimal cost;
     @CreatedDate
     @Column(name = "create_date")
@@ -40,9 +36,8 @@ public class Purchase {
     private LocalDateTime lastUpdateDate;
     @Column(nullable = false)
     private Long userId;
-    @ToString.Exclude
     @OneToMany(mappedBy = "purchase")
-    @JsonIgnore
+    @ToString.Exclude
     private Set<PurchaseCertificate> purchaseCertificates;
 
     @Override

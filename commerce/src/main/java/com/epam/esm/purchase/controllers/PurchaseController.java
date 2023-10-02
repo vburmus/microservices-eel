@@ -3,6 +3,7 @@ package com.epam.esm.purchase.controllers;
 import com.epam.esm.purchase.models.PurchaseCreationRequest;
 import com.epam.esm.purchase.models.PurchaseDTO;
 import com.epam.esm.purchase.service.PurchaseService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,8 +18,8 @@ public class PurchaseController {
     private final PurchaseService purchaseService;
 
     @PostMapping
-    public ResponseEntity<PurchaseDTO> create(@RequestBody PurchaseCreationRequest purchaseCreationRequest) {
-        return ResponseEntity.ok(purchaseService.createPurchase(purchaseCreationRequest));
+    public ResponseEntity<PurchaseDTO> create(@Valid @RequestBody PurchaseCreationRequest purchaseCreationRequest) {
+        return ResponseEntity.ok(purchaseService.create(purchaseCreationRequest));
     }
 
     @GetMapping

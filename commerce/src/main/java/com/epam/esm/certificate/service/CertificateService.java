@@ -6,8 +6,9 @@ import com.epam.esm.certificate.repository.CertificateRepository;
 import com.epam.esm.tag.models.Tag;
 import com.epam.esm.tag.service.TagService;
 import com.epam.esm.utils.EntityToDtoMapper;
-import com.epam.esm.utils.Validation;
-import com.epam.esm.utils.exceptionhandler.exceptions.*;
+import com.epam.esm.utils.exceptionhandler.exceptions.CertificateUpdateException;
+import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchObjectException;
+import com.epam.esm.utils.exceptionhandler.exceptions.ObjectAlreadyExists;
 import com.epam.esm.utils.openfeign.AwsUtilsFeignClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -45,22 +46,15 @@ public class CertificateService {
     @Transactional
     public CertificateDTO create(CertificateDTO giftCertificateDTO, Optional<MultipartFile> image) {
         Certificate certificate = entityToDtoMapper.toCertificate(giftCertificateDTO);
-        ExampleMatcher gcMatcher = ExampleMatcher.matching()
-                .withIgnorePaths(CREATE_DATE, LAST_UPDATE, ID, PRICE)
-                .withMatcher(NAME, exact())
-                .withMatcher(SHORT_DESCRIPTION, exact())
-                .withMatcher(DURATION_DATE, exact());
-        Example<Certificate> providedGC = Example.of(certificate, gcMatcher);
+        if (ifExist(certificate))
+            throw new ObjectAlreadyExists(String.format(CERTIFICATE_EXISTS, certificate.getName(),
+                    certificate.getDurationDate()));
+
+        LocalDateTime now = LocalDateTime.now();
+        certificate.setCreateDate(now);
+        certificate.setLastUpdateDate(now);
+
         List<Tag> tags = certificate.getTags();
-
-        if (tags == null) throw new NullableTagsException(CERTIFICATE_SHOULD_HAVE_AT_LEAST_ONE_TAG);
-        if (certificateRepository.exists(providedGC)) throw new ObjectAlreadyExists(
-                String.format(CERTIFICATE_EXISTS, certificate.getName(), certificate.getDurationDate()));
-        if (!Validation.isValidCertificate(certificate)) throw new ObjectInvalidException(
-                String.format(CERTIFICATE_IS_INVALID, certificate.getName(), certificate.getDurationDate()));
-
-        certificate.setCreateDate(LocalDateTime.now());
-        certificate.setLastUpdateDate(LocalDateTime.now());
         certificate.setTags(tagService.checkTagsAndFetch(tags));
         image.ifPresentOrElse(
                 img -> certificate.setImageUrl(awsClient.uploadImage(CERTIFICATES, img)),
@@ -126,5 +120,14 @@ public class CertificateService {
                     throw new NoSuchObjectException(String.format(TAG_DOESNT_EXIST_ID, id));
                 }
         );
+    }
+
+    private boolean ifExist(Certificate certificate) {
+        ExampleMatcher gcMatcher = ExampleMatcher.matching()
+                .withIgnorePaths(CREATE_DATE, LAST_UPDATE, ID, PRICE)
+                .withMatcher(NAME, exact())
+                .withMatcher(SHORT_DESCRIPTION, exact())
+                .withMatcher(DURATION_DATE, exact());
+        return certificateRepository.exists(Example.of(certificate, gcMatcher));
     }
 }
