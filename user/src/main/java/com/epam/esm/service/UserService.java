@@ -78,7 +78,6 @@ public class UserService {
         user.setSurname(updatedUser.getSurname());
         user.setEmail(updatedUser.getEmail());
         user.setPhone(updatedUser.getPhone());
-        user.setPassword(updatedUser.getPassword());
     }
 
     public void delete(Long id) {

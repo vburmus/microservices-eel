@@ -6,7 +6,5 @@ public record UserDTO(
         String surname,
         String phone,
         String email,
-        Role role,
-        Provider provider,
         String imageUrl) {
 }
