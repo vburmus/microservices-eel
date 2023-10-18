@@ -1,6 +1,8 @@
 package com.epam.esm.utils.exceptionhandler;
 
 import com.epam.esm.utils.exceptionhandler.exceptions.*;
+import com.epam.esm.utils.exceptions.RestApiClientException;
+import com.epam.esm.utils.exceptions.RestApiServerException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatchException;
 import org.springframework.core.Ordered;
@@ -35,21 +37,15 @@ public class RestExceptionHandler {
     }
 
     @ExceptionHandler(NoSuchObjectException.class)
-    public ResponseEntity<Problem> handleCertificateAlreadyExistException(NoSuchObjectException e) {
+    public ResponseEntity<Problem> handleNoSuchObjectException(NoSuchObjectException e) {
         Problem problem = buildProblem(Status.NOT_FOUND, NO_SUCH_ITEM_ERROR, e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
     }
 
     @ExceptionHandler(ObjectAlreadyExists.class)
-    public ResponseEntity<Problem> handleTagAlreadyExistsException(ObjectAlreadyExists e) {
+    public ResponseEntity<Problem> handleObjectAlreadyExistsException(ObjectAlreadyExists e) {
         Problem problem = buildProblem(Status.CONFLICT, ALREADY_EXIST_ERROR, e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
-    }
-
-    @ExceptionHandler({ObjectInvalidException.class, NullableTagsException.class})
-    public ResponseEntity<Problem> handleInvalidObjectException(ObjectInvalidException e) {
-        Problem problem = buildProblem(Status.BAD_REQUEST, INVALID_ITEM_ERROR, e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
     @ExceptionHandler(PropertyReferenceException.class)
