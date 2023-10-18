@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth
+    username: ${SQL_USERNAME}
+    password: ${SQL_PASSWORD}
+server:
+  port: 0
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+logging:
+  level:
+   root: debug
+   feign: debug
+   org.springframework.security: debug
