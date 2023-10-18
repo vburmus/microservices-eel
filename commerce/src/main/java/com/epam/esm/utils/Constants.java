@@ -11,10 +11,6 @@ public class Constants {
     public static final String UPDATE_ERROR = "Update Error";
     public static final String PURCHASE_ERROR = "Purchase Error";
     public static final String NO_SUCH_ITEM_ERROR = "No Such Item Error";
-    public static final String ERROR_WHILE_MAKING_API_CALL_TO = "Error while making API call to: ";
-    public static final String AN_INTERNAL_SERVER_ERROR_OCCURRED_WHILE_PROCESSING_THE_REQUEST = "An internal server " +
-            "error occurred while processing the request.";
-    public static final String GENERIC_EXCEPTION = "Generic exception";
     public static final String TAG_ALREADY_EXISTS = "Tag with name %s already exists";
     public static final String TAG_DOESNT_EXIST_ID = "Tag with id %d doesn't exist";
     public static final String TAGS = "tags";
@@ -43,7 +39,6 @@ public class Constants {
             "LIKE %:partialNameOrShortDescription% OR c.shortDescription LIKE %:partialNameOrShortDescription%";
     public static final String PURCHASE_DOES_NOT_EXISTS_ID = "Purchase with id %d " +
             "doesn't exist";
-    public static final String WRONG_POSITION_PURCHASE = "Wrong position arguments, please check your purchase items";
     public static final String JSON_EXCEPTION = "Json Exception";
     public static final String SHOULD_HAVE_AT_LEAST_ONE_TAG = "Should have at least one tag";
     public static final String SHOULD_HAVE_TAGS = "Should have tags";
