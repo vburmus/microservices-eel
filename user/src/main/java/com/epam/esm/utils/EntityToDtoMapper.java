@@ -8,9 +8,8 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface EntityToDtoMapper {
-    @Mapping(target = "id",ignore = true)
-    @Mapping(target = "imageUrl",ignore = true)
-    @Mapping(target = "role",ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "imageUrl", ignore = true)
     User toUser(RegisterRequest registerRequest);
 
     UserDTO toUserDTO(User userDTO);
