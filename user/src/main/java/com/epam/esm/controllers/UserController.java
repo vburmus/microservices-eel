@@ -37,9 +37,9 @@ public class UserController {
         return ResponseEntity.ok(userService.readAll(pageable));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getById(@PathVariable("id") long id) {
-        return ResponseEntity.ok(userService.getById(id));
+    @GetMapping("/by-email")
+    public ResponseEntity<UserDTO> getByEmail(@RequestParam("email") String email) {
+        return ResponseEntity.ok(userService.getByEmail(email));
     }
 
     @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

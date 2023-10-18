@@ -1,7 +1,6 @@
 package com.epam.esm.service;
 
 import com.epam.esm.models.RegisterRequest;
-import com.epam.esm.models.Role;
 import com.epam.esm.models.User;
 import com.epam.esm.models.UserDTO;
 import com.epam.esm.repository.UserRepository;
@@ -43,7 +42,6 @@ public class UserService {
             throw new UserAlreadyExistException(String.format(ALREADY_REGISTERED, registerRequest.email()));
         });
         User user = entityToDtoMapper.toUser(registerRequest);
-        user.setRole(Role.USER);
         image.ifPresentOrElse(
                 img -> user.setImageUrl(awsClient.uploadImage(USERS, img)),
                 () -> user.setImageUrl(defaultImageUrl)
@@ -55,9 +53,9 @@ public class UserService {
         return userRepository.findAll(pageable).map(entityToDtoMapper::toUserDTO);
     }
 
-    public UserDTO getById(Long id) {
-        return userRepository.findById(id).map(entityToDtoMapper::toUserDTO)
-                .orElseThrow(() -> new NoSuchUserException(String.format(USER_DOESNT_EXIST_ID, id)));
+    public UserDTO getByEmail(String email) {
+        return userRepository.findByEmail(email).map(entityToDtoMapper::toUserDTO)
+                .orElseThrow(() -> new NoSuchUserException(String.format(USER_DOESNT_EXIST_EMAIL, email)));
     }
 
     @Transactional
