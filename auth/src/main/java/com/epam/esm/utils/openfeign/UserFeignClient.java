@@ -1,6 +1,5 @@
 package com.epam.esm.utils.openfeign;
 
-import com.epam.esm.auth.models.CreateUserRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;

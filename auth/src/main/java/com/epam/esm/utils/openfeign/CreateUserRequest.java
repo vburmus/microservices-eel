@@ -1,4 +1,4 @@
-package com.epam.esm.auth.models;
+package com.epam.esm.utils.openfeign;
 
 public record CreateUserRequest(
         String name,

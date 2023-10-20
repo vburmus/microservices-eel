@@ -4,10 +4,6 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Constants {
-    public static final String ERROR_WHILE_MAKING_API_CALL_TO = "Error while making API call to: ";
-    public static final String AN_INTERNAL_SERVER_ERROR_OCCURRED = "An internal server " +
-            "error occurred.";
-    public static final String GENERIC_EXCEPTION = "Generic exception";
     public static final String ID = "id";
     public static final String ROLE = "role";
     public static final String EPAM = "epam";

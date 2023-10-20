@@ -32,7 +32,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<TokenDTO> authenticate(@RequestBody AuthenticationRequest request) {
+    public ResponseEntity<TokenDTO> authenticate(@Valid @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
