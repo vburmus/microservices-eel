@@ -1,6 +1,8 @@
 package com.epam.esm.utils.exceptionhandler;
 
-import com.epam.esm.utils.exceptionhandler.exceptions.*;
+import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchUserException;
+import com.epam.esm.utils.exceptionhandler.exceptions.UserAlreadyExistException;
+import com.epam.esm.utils.exceptionhandler.exceptions.UserUpdateException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatchException;
 import org.springframework.core.Ordered;
@@ -23,18 +25,6 @@ public class RestExceptionHandler {
     @ExceptionHandler({JsonPatchException.class, JsonProcessingException.class})
     public ResponseEntity<Problem> handleJsonExceptions(RuntimeException ex) {
         Problem problem = buildProblem(Status.INTERNAL_SERVER_ERROR, JSON_EXCEPTION, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
-    }
-
-    @ExceptionHandler(RestApiClientException.class)
-    public ResponseEntity<Problem> handleRestApiClientException(RestApiClientException e) {
-        Problem problem = buildProblem(Status.BAD_REQUEST, API_CALL_ERROR, e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
-    }
-
-    @ExceptionHandler(RestApiServerException.class)
-    public ResponseEntity<Problem> handleRestApiServerException(RestApiServerException e) {
-        Problem problem = buildProblem(Status.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR, e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }
 

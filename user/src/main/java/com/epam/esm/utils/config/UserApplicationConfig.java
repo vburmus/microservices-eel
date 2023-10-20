@@ -1,5 +1,7 @@
 package com.epam.esm.utils.config;
 
+import com.epam.esm.filter.ServiceAuthenticationFilter;
+import com.epam.esm.utils.openfeign.AuthFeignClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -11,6 +13,7 @@ import org.zalando.problem.violations.ConstraintViolationProblemModule;
 
 @Configuration
 public class UserApplicationConfig {
+
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper().registerModules(
@@ -22,5 +25,10 @@ public class UserApplicationConfig {
     @LoadBalanced
     public RestTemplate restTemplate() {
         return new RestTemplate();
+    }
+
+    @Bean
+    public ServiceAuthenticationFilter serviceAuthenticationFilter(AuthFeignClient authFeignClient){
+        return new ServiceAuthenticationFilter(authFeignClient);
     }
 }

@@ -1,8 +1,6 @@
 package com.epam.esm.utils.exceptionhandler;
 
 import com.epam.esm.utils.exceptionhandler.exceptions.*;
-import com.epam.esm.utils.exceptions.RestApiClientException;
-import com.epam.esm.utils.exceptions.RestApiServerException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatchException;
 import org.springframework.core.Ordered;
@@ -24,17 +22,6 @@ import static com.epam.esm.utils.Constants.*;
 @ControllerAdvice
 public class RestExceptionHandler {
 
-    @ExceptionHandler(RestApiClientException.class)
-    public ResponseEntity<Problem> handleRestApiClientException(RestApiClientException e) {
-        Problem problem = buildProblem(Status.BAD_REQUEST, API_CALL_ERROR, e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
-    }
-
-    @ExceptionHandler(RestApiServerException.class)
-    public ResponseEntity<Problem> handleRestApiServerException(RestApiServerException e) {
-        Problem problem = buildProblem(Status.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR, e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
-    }
 
     @ExceptionHandler(NoSuchObjectException.class)
     public ResponseEntity<Problem> handleNoSuchObjectException(NoSuchObjectException e) {

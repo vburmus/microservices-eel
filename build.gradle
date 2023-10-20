@@ -43,9 +43,9 @@ subprojects {
             dependency 'io.jsonwebtoken:jjwt-api:0.11.5'
             dependency 'io.jsonwebtoken:jjwt-impl:0.11.5'
             dependency 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-            dependency 'com.github.vburmus:auth-library:1.1'
             dependency 'com.github.ben-manes.caffeine:caffeine:3.0.4'
             dependency 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
+            dependency 'com.github.vburmus:auth-library:1.2'
         }
         imports {
             mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2022.0.3'
