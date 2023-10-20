@@ -5,6 +5,7 @@ import com.epam.esm.jwt.TokenType;
 import com.epam.esm.utils.exceptionhandler.exceptions.CacheException;
 import com.epam.esm.utils.exceptionhandler.exceptions.IncorrectTokenTypeException;
 import com.epam.esm.utils.exceptionhandler.exceptions.InvalidTokenException;
+import com.epam.esm.utils.exceptionhandler.exceptions.TokenRequiredException;
 import com.epam.esm.utils.openfeign.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -57,12 +58,13 @@ public class JwtService {
         return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
     }
 
-    public void validateToken(String token) {
-        if (!StringUtils.hasText(token) || !token.startsWith(AUTHENTICATION_BEARER_TOKEN))
-            throw new InvalidTokenException(REFRESH_TOKEN_NEEDED);
-        if(isTokenBanned(token))
+    public void validateToken(String bearerToken) {
+        if (!StringUtils.hasText(bearerToken) || !bearerToken.startsWith(AUTHENTICATION_BEARER_TOKEN))
+            throw new TokenRequiredException(TOKEN_NEEDED);
+        String jwt = bearerToken.substring(7);
+        if(isTokenBanned(jwt))
             throw new InvalidTokenException(TOKEN_HAS_BEEN_BANNED);
-        extractAllClaims(token.substring(7));
+        extractAllClaims(jwt);
     }
 
     public boolean isTokenBanned(String token) {

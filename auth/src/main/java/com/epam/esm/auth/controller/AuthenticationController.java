@@ -46,8 +46,8 @@ public class AuthenticationController {
     }
 
     @GetMapping("/role")
-    public ResponseEntity<String> getRole(@RequestHeader("Authorization") String token) {
-        jwtService.validateToken(token);
-        return ResponseEntity.ok(authenticationService.getRole(token.substring(7)));
+    public ResponseEntity<String> getRole(@RequestHeader("Authorization") String bearerToken) {
+        jwtService.validateToken(bearerToken);
+        return ResponseEntity.ok(authenticationService.getRole(bearerToken.substring(7)));
     }
 }
