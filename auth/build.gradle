@@ -18,4 +18,5 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson'
     implementation 'io.hypersistence:hypersistence-utils-hibernate-62'
     implementation 'com.github.ben-manes.caffeine:caffeine'
+    implementation 'com.github.vburmus:auth-library'
 }

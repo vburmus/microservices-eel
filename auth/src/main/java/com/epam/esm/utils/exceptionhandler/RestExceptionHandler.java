@@ -21,17 +21,6 @@ import static com.epam.esm.utils.Constants.*;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class RestExceptionHandler {
-    @ExceptionHandler(RestApiClientException.class)
-    public ResponseEntity<Problem> handleRestApiClientException(RestApiClientException e) {
-        Problem problem = buildProblem(Status.BAD_REQUEST, API_CALL_ERROR, e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
-    }
-
-    @ExceptionHandler(RestApiServerException.class)
-    public ResponseEntity<Problem> handleRestApiServerException(RestApiServerException e) {
-        Problem problem = buildProblem(Status.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR, e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Problem> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
@@ -71,6 +60,7 @@ public class RestExceptionHandler {
         Problem problem = buildProblem(Status.BAD_REQUEST, TOKEN_ERROR, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
+
     private Problem buildProblem(Status status, String title, String detail) {
         return Problem.builder()
                 .withStatus(status)

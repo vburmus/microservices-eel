@@ -21,7 +21,7 @@ public class Constants {
     public static final String AUTHENTICATION_BEARER_TOKEN = "Bearer ";
     public static final String CACHE_NOT_FOUND = "Cache not found";
     public static final String MISSING_USER_EMAIL = "Missing user email";
-    public static final String REFRESH_TOKEN_NEEDED = "Refresh request should contain refresh token.";
+    public static final String TOKEN_NEEDED = "Request should contain token.";
     public static final String EMAIL_IS_ALREADY_REGISTERED = "Email is already registered";
     public static final String NAME_SHOULD_BE_LESS_THAN_30_CHARS = "Name should be less than 30 chars";
     public static final String NAME_CAN_T_BE_BLANK = "Name can't be blank";
@@ -36,8 +36,7 @@ public class Constants {
     public static final String TOKEN_HAS_BEEN_BANNED = "Token has been banned";
     public static final String INVALID_USER_ERROR = "Invalid User Error";
     public static final String AUTHENTICATION_EXCEPTION = "Authentication Exception";
-    public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
-    public static final String API_CALL_ERROR = "Api Call Error";
     public static final String WRONG_EMAIL_OR_PASSWORD = "Wrong email or password";
     public static final String CREDENTIALS_ERROR = "Credentials Error";
+    public static final String TOKEN_ERROR = "Invalid Token Error";
 }
