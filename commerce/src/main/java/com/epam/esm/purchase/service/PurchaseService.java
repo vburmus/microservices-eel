@@ -2,6 +2,7 @@ package com.epam.esm.purchase.service;
 
 import com.epam.esm.certificate.models.Certificate;
 import com.epam.esm.certificate.service.CertificateService;
+import com.epam.esm.model.UserDTO;
 import com.epam.esm.purchase.models.Purchase;
 import com.epam.esm.purchase.models.PurchaseCreationRequest;
 import com.epam.esm.purchase.models.PurchaseDTO;
@@ -15,6 +16,7 @@ import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchObjectException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,10 +40,11 @@ public class PurchaseService {
     @Transactional
     public PurchaseDTO create(PurchaseCreationRequest purchaseCreationRequest) {
         Map<Certificate, Integer> certificateQuantityMap = createCertificateQuantityMap(purchaseCreationRequest);
+        UserDTO user = (UserDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         LocalDateTime now = LocalDateTime.now();
         Purchase savedPurchase = purchaseRepository.save(
                 Purchase.builder()
-                        .userId(purchaseCreationRequest.userId())
+                        .userId(user.getId())
                         .description(purchaseCreationRequest.description())
                         .cost(getPurchaseCost(certificateQuantityMap))
                         .createDate(now)
