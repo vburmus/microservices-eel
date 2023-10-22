@@ -35,4 +35,5 @@ public class Constants {
     public static final String WRONG_EMAIL_OR_PASSWORD = "Wrong email or password";
     public static final String CREDENTIALS_ERROR = "Credentials Error";
     public static final String TOKEN_ERROR = "Invalid Token Error";
+    public static final String USER_NOT_EXIST_EMAIL = "User with email %s not found";
 }

@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import static com.epam.esm.utils.Constants.USER_NOT_EXIST_EMAIL;
+
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +17,7 @@ public class CustomUserCredentialsService implements UserDetailsService {
 
     @Override
     public Credentials loadUserByUsername(String email) {
-        return credentialsRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not " +
-                "found"));
+        return credentialsRepository.findByEmail(email).orElseThrow(
+                () -> new UsernameNotFoundException(String.format(USER_NOT_EXIST_EMAIL, email)));
     }
 }
