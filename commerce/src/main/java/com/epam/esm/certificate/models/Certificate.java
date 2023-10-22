@@ -61,6 +61,6 @@ public class Certificate {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(id,name,shortDescription,longDescription,price,imageUrl,createDate);
     }
 }

@@ -50,6 +50,6 @@ public class Purchase {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(id,description,description,cost,createDate);
     }
 }
