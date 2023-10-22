@@ -21,8 +21,6 @@ import static com.epam.esm.utils.Constants.*;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class RestExceptionHandler {
-
-
     @ExceptionHandler(NoSuchObjectException.class)
     public ResponseEntity<Problem> handleNoSuchObjectException(NoSuchObjectException e) {
         Problem problem = buildProblem(Status.NOT_FOUND, NO_SUCH_ITEM_ERROR, e.getMessage());

@@ -40,7 +40,8 @@ public class CertificateController {
     public ResponseEntity<CertificateDTO> updateCertificate(
             @PathVariable("id") long id,
             @RequestPart(value = "patch") JsonMergePatch patch,
-            @RequestPart(value = "image") Optional<MultipartFile> image) throws JsonPatchException, JsonProcessingException {
+            @RequestPart(value = "image") Optional<MultipartFile> image) throws JsonPatchException,
+            JsonProcessingException {
         return ResponseEntity.ok(giftCertificateService.updateCertificate(id, patch, image));
     }
 
@@ -65,7 +66,8 @@ public class CertificateController {
     @GetMapping("/search/by-name-or-description-part")
     public ResponseEntity<Page<CertificateDTO>> getByNameOrDescriptionPart(@RequestParam("part") String nameOrDescriptionPart,
                                                                            @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(giftCertificateService.getByNameOrShortDescriptionPart(nameOrDescriptionPart, pageable));
+        return ResponseEntity.ok(giftCertificateService.getByNameOrShortDescriptionPart(nameOrDescriptionPart,
+                pageable));
     }
 
     @GetMapping({"/search/by-tags-and-part"})
