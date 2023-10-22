@@ -4,14 +4,14 @@ import com.epam.esm.auth.models.AuthenticationRequest;
 import com.epam.esm.auth.models.RegisterRequest;
 import com.epam.esm.auth.models.TokenDTO;
 import com.epam.esm.credentials.model.Credentials;
-import com.epam.esm.credentials.model.Role;
 import com.epam.esm.credentials.service.CredentialsService;
 import com.epam.esm.credentials.service.CustomUserCredentialsService;
 import com.epam.esm.jwt.service.JwtService;
 import com.epam.esm.jwt.service.TokenGenerator;
+import com.epam.esm.model.Role;
+import com.epam.esm.model.UserDTO;
 import com.epam.esm.utils.EntityToDtoMapper;
 import com.epam.esm.utils.exceptionhandler.exceptions.EmailNotFoundException;
-import com.epam.esm.utils.openfeign.User;
 import com.epam.esm.utils.openfeign.UserFeignClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,13 +36,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     public TokenDTO register(RegisterRequest request, MultipartFile image) {
         credentialsService.createCredentials(request);
-        User user = userClient.create(entityToDtoMapper.toUserCreationRequest(request), image);
+        UserDTO user = userClient.create(entityToDtoMapper.toUserCreationRequest(request), image);
         user.setRole(Role.USER);
         return tokenGenerator.createToken(user);
     }
 
     public TokenDTO authenticate(AuthenticationRequest request) {
-        User user = userClient.getByEmail(request.email());
+        UserDTO user = userClient.getByEmail(request.email());
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(),
                 request.password()));
         Credentials credentials = userDetailsService.loadUserByUsername(request.email());
@@ -51,15 +51,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     public String refreshToken(String jwt) {
-        User user = getUserFromJwt(jwt);
+        UserDTO user = getUserFromJwt(jwt);
         return tokenGenerator.createAccessToken(user);
     }
 
-    public String getRole(String jwt) {
-        return jwtService.extractRole(jwt);
+    public UserDTO decodeUserFromJwt(String jwt) {
+        UserDTO user = getUserFromJwt(jwt);
+        Credentials credentials = userDetailsService.loadUserByUsername(user.getEmail());
+        user.setRole(credentials.getRole());
+        user.setProvider(credentials.getProvider());
+        return user;
     }
 
-    private User getUserFromJwt(String jwt) {
+    private UserDTO getUserFromJwt(String jwt) {
         String email = jwtService.extractUsername(jwt);
         if (email == null) throw new EmailNotFoundException(MISSING_USER_EMAIL);
         return userClient.getByEmail(email);

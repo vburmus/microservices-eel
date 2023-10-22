@@ -1,5 +1,7 @@
 package com.epam.esm.credentials.model;
 
+import com.epam.esm.model.Provider;
+import com.epam.esm.model.Role;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,10 +32,12 @@ public class Credentials implements UserDetails {
     private String password;
     @Enumerated(EnumType.STRING)
     @Type(value = PostgreSQLEnumType.class)
-    private Role role;
+    @Builder.Default
+    private Role role = Role.USER;
     @Enumerated(EnumType.STRING)
     @Type(value = PostgreSQLEnumType.class)
-    private Provider provider;
+    @Builder.Default
+    private Provider provider = Provider.LOCAL;
 
     @Override
     public boolean equals(Object o) {
@@ -85,5 +89,9 @@ public class Credentials implements UserDetails {
 
     public Role getRole() {
         return role;
+    }
+
+    public Provider getProvider() {
+        return provider;
     }
 }

@@ -3,6 +3,7 @@ package com.epam.esm.auth.service;
 import com.epam.esm.auth.models.AuthenticationRequest;
 import com.epam.esm.auth.models.RegisterRequest;
 import com.epam.esm.auth.models.TokenDTO;
+import com.epam.esm.model.UserDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AuthenticationService {
@@ -12,5 +13,5 @@ public interface AuthenticationService {
 
     String refreshToken(String jwt);
 
-    String getRole(String jwt);
+    UserDTO decodeUserFromJwt(String jwt);
 }

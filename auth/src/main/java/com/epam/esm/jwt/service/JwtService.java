@@ -2,11 +2,11 @@ package com.epam.esm.jwt.service;
 
 
 import com.epam.esm.jwt.TokenType;
+import com.epam.esm.model.UserDTO;
 import com.epam.esm.utils.exceptionhandler.exceptions.CacheException;
 import com.epam.esm.utils.exceptionhandler.exceptions.IncorrectTokenTypeException;
 import com.epam.esm.utils.exceptionhandler.exceptions.InvalidTokenException;
 import com.epam.esm.utils.exceptionhandler.exceptions.TokenRequiredException;
-import com.epam.esm.utils.openfeign.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -62,7 +62,7 @@ public class JwtService {
         if (!StringUtils.hasText(bearerToken) || !bearerToken.startsWith(AUTHENTICATION_BEARER_TOKEN))
             throw new TokenRequiredException(TOKEN_NEEDED);
         String jwt = bearerToken.substring(7);
-        if(isTokenBanned(jwt))
+        if (isTokenBanned(jwt))
             throw new InvalidTokenException(TOKEN_HAS_BEEN_BANNED);
         extractAllClaims(jwt);
     }
@@ -119,9 +119,10 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createSignedJwt(User user, TokenType tokenType) {
+    public String createSignedJwt(UserDTO user, TokenType tokenType) {
         Instant now = Instant.now();
-        return Jwts.builder().setId(user.getId().toString())
+        return Jwts.builder()
+                .claim(ID, user.getId())
                 .setSubject(user.getEmail())
                 .claim(NAME, user.getName())
                 .claim(SURNAME, user.getSurname())

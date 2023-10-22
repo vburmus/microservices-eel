@@ -5,6 +5,7 @@ import com.epam.esm.auth.models.RegisterRequest;
 import com.epam.esm.auth.models.TokenDTO;
 import com.epam.esm.auth.service.AuthenticationService;
 import com.epam.esm.jwt.service.JwtService;
+import com.epam.esm.model.UserDTO;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -45,9 +46,9 @@ public class AuthenticationController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/role")
-    public ResponseEntity<String> getRole(@RequestHeader("Authorization") String bearerToken) {
+    @GetMapping("/user")
+    public ResponseEntity<UserDTO> getUserFromJwt(@RequestHeader("Authorization") String bearerToken) {
         jwtService.validateToken(bearerToken);
-        return ResponseEntity.ok(authenticationService.getRole(bearerToken.substring(7)));
+        return ResponseEntity.ok(authenticationService.decodeUserFromJwt(bearerToken.substring(7)));
     }
 }

@@ -2,8 +2,6 @@ package com.epam.esm.credentials.service;
 
 import com.epam.esm.auth.models.RegisterRequest;
 import com.epam.esm.credentials.model.Credentials;
-import com.epam.esm.credentials.model.Provider;
-import com.epam.esm.credentials.model.Role;
 import com.epam.esm.credentials.repository.CredentialsRepository;
 import com.epam.esm.utils.exceptionhandler.exceptions.EmailAlreadyRegisteredException;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +25,6 @@ public class CredentialsServiceImpl implements CredentialsService {
         Credentials credentials = Credentials.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .provider(Provider.LOCAL)
-                .role(Role.USER)
                 .build();
         credentialsRepository.save(credentials);
     }
