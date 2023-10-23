@@ -2,7 +2,7 @@ spring:
   application:
     name: auth-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/auth
+    url: ${SQL_URI}
     username: ${SQL_USERNAME}
     password: ${SQL_PASSWORD}
 server:
@@ -10,7 +10,7 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_URI}
 logging:
   level:
    root: info
