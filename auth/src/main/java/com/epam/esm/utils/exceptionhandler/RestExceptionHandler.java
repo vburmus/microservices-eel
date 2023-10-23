@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 
+import static com.epam.esm.utils.AuthConstants.AN_INTERNAL_SERVER_ERROR_OCCURRED_WHILE_PROCESSING_THE_REQUEST;
 import static com.epam.esm.utils.Constants.*;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -49,9 +50,10 @@ public class RestExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
-    @ExceptionHandler(CacheException.class)
-    public ResponseEntity<Problem> handleCacheError(CacheException e) {
-        Problem problem = buildProblem(Status.INTERNAL_SERVER_ERROR, e.getMessage(), WRONG_EMAIL_OR_PASSWORD);
+    @ExceptionHandler({CacheException.class, IncorrectTokenTypeException.class})
+    public ResponseEntity<Problem> handleCacheError() {
+        Problem problem = buildProblem(Status.INTERNAL_SERVER_ERROR, Status.INTERNAL_SERVER_ERROR.toString(),
+                AN_INTERNAL_SERVER_ERROR_OCCURRED_WHILE_PROCESSING_THE_REQUEST);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }
 
