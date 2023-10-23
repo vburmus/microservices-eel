@@ -20,5 +20,4 @@ public record PurchaseDTO(
         LocalDateTime lastUpdateDate,
         Long userId,
         Set<PurchaseCertificate> purchaseCertificates) {
-
 }

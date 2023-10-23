@@ -13,7 +13,6 @@ import org.zalando.problem.violations.ConstraintViolationProblemModule;
 
 @Configuration
 public class UserApplicationConfig {
-
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper().registerModules(

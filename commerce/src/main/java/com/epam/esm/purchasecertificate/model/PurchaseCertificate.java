@@ -21,16 +21,13 @@ public class PurchaseCertificate {
     @EmbeddedId
     @JsonIgnore
     private PurchaseCertificatePK purchaseCertificatePK;
-
     @ManyToOne
     @MapsId("certificateId")
     private Certificate certificate;
-
     @ManyToOne
     @MapsId("purchaseId")
     @JsonIgnore
     private Purchase purchase;
-
     private Integer quantity;
 
     @Override
