@@ -1,9 +1,8 @@
 package com.epam.esm.models;
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Type;
 
 import java.util.Objects;
 
@@ -23,14 +22,6 @@ public class User {
     private String surname;
     private String phone;
     private String email;
-    @Enumerated(EnumType.STRING)
-    @Type(value = PostgreSQLEnumType.class)
-    private Role role;
-    @ToString.Exclude
-    private String password;
-    @Enumerated(EnumType.STRING)
-    @Type(value = PostgreSQLEnumType.class)
-    private Provider provider;
     private String imageUrl;
 
     @Override
@@ -43,6 +34,6 @@ public class User {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(id,name,surname,phone,email,imageUrl);
     }
 }

@@ -31,6 +31,6 @@ public class Tag {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(id,name,imageUrl);
     }
 }

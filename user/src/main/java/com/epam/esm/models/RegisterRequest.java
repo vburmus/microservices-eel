@@ -1,6 +1,5 @@
 package com.epam.esm.models;
 
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -18,9 +17,5 @@ public record RegisterRequest(
         String phone,
         @Size(max = 255, message = EMAIL_BE_LESS_THAN_255_CHARS)
         @NotBlank(message = EMAIL_CAN_T_BE_BLANK)
-        String email,
-        @NotBlank(message = PASSWORD_CAN_T_BE_EMPTY)
-        String password,
-        @NotBlank(message = PROVIDER_CAN_T_BE_EMPTY)
-        Provider provider) {
+        String email) {
 }
