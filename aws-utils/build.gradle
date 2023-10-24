@@ -1,0 +1,12 @@
+dependencies {
+    implementation 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.zalando:problem-spring-web'
+    implementation 'com.amazonaws:aws-java-sdk-s3'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'com.google.code.gson:gson'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui'
+    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+}
