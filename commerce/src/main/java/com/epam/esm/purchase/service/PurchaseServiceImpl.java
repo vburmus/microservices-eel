@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -44,14 +43,12 @@ public class PurchaseServiceImpl implements PurchaseService {
     public PurchaseDTO create(PurchaseCreationRequest purchaseCreationRequest) {
         Map<Certificate, Integer> certificateQuantityMap = createCertificateQuantityMap(purchaseCreationRequest);
         UserDTO user = (UserDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        LocalDateTime now = LocalDateTime.now();
+
         Purchase savedPurchase = purchaseRepository.save(
                 Purchase.builder()
                         .userId(user.getId())
                         .description(purchaseCreationRequest.description())
                         .cost(getPurchaseCost(certificateQuantityMap))
-                        .createDate(now)
-                        .lastUpdateDate(now)
                         .build());
         Set<PurchaseCertificate> purchaseCertificates = createPurchaseCertificateSet(certificateQuantityMap,
                 savedPurchase);
