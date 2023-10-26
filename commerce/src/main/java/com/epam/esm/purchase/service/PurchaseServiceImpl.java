@@ -12,6 +12,8 @@ import com.epam.esm.purchasecertificate.model.PurchaseCertificate;
 import com.epam.esm.purchasecertificate.model.PurchaseCertificatePK;
 import com.epam.esm.purchasecertificate.repository.PurchaseCertificateRepository;
 import com.epam.esm.utils.EntityToDtoMapper;
+import com.epam.esm.utils.amqp.MessagePublisher;
+import com.epam.esm.utils.amqp.PurchaseCreationMessage;
 import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchObjectException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,6 +38,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final PurchaseCertificateRepository purchaseCertificateRepository;
     private final CertificateService certificateService;
     private final EntityToDtoMapper entityToDtoMapper;
+    private final MessagePublisher messagePublisher;
 
     @Transactional
     public PurchaseDTO create(PurchaseCreationRequest purchaseCreationRequest) {
@@ -53,6 +56,12 @@ public class PurchaseServiceImpl implements PurchaseService {
         Set<PurchaseCertificate> purchaseCertificates = createPurchaseCertificateSet(certificateQuantityMap,
                 savedPurchase);
         savedPurchase.setPurchaseCertificates(purchaseCertificates);
+
+        PurchaseCreationMessage message = PurchaseCreationMessage.builder()
+                .email(user.getEmail())
+                .purchaseDTO(entityToDtoMapper.toPurchaseDTO(savedPurchase))
+                .build();
+        messagePublisher.publishMessage(message);
         return entityToDtoMapper.toPurchaseDTO(savedPurchase);
     }
 
