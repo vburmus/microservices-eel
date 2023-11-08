@@ -42,4 +42,8 @@ public class TokenGenerator {
         cache.put(user.getId(), jwt);
         return jwt;
     }
+
+    public String createValidationToken(UserDTO user) {
+        return jwtService.createSignedJwt(user, TokenType.EMAIL_VALIDATION);
+    }
 }

@@ -21,7 +21,6 @@ import org.springframework.util.StringUtils;
 
 import java.security.Key;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +38,10 @@ public class JwtService {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public TokenType extractType(String token) {
+        return TokenType.valueOf(extractClaim(token, claims -> claims.get(TYPE, String.class)));
     }
 
     public long extractId(String token) {
@@ -116,7 +119,6 @@ public class JwtService {
     }
 
     public String createSignedJwt(UserDTO user, TokenType tokenType) {
-        Instant now = Instant.now();
         return Jwts.builder()
                 .claim(ID, user.getId())
                 .setSubject(user.getEmail())
@@ -125,11 +127,8 @@ public class JwtService {
                 .claim(ROLE, user.getRole())
                 .claim(TYPE, tokenType)
                 .setIssuer(EPAM)
-                .setIssuedAt(Date.from(now))
-                .setExpiration(
-                        tokenType == TokenType.ACCESS ?
-                                Date.from(now.plus(60, ChronoUnit.MINUTES)) :
-                                Date.from(now.plus(2, ChronoUnit.DAYS)))
+                .setIssuedAt(Date.from(Instant.now()))
+                .setExpiration(tokenType.getExpiryDate())
                 .signWith(getSignKey()).compact();
     }
 }
