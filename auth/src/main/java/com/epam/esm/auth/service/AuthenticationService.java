@@ -14,4 +14,6 @@ public interface AuthenticationService {
     String refreshToken(String jwt);
 
     UserDTO decodeUserFromJwt(String jwt);
+
+    void activateAccount(String token);
 }

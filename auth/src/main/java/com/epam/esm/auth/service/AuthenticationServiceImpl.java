@@ -78,6 +78,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return user;
     }
 
+    @Override
+    @Transactional
+    public void activateAccount(String token) {
+        String email = jwtService.extractUsername(token);
+        if (jwtService.extractType(token) != TokenType.EMAIL_VALIDATION || email.isEmpty()) {
+            throw new InvalidTokenException(INVALID_VALIDATION_TOKEN);
+        }
+        credentialsService.activateAccount(email);
+    }
+
     private UserDTO getUserFromJwt(String jwt) {
         String email = jwtService.extractUsername(jwt);
         if (email == null) throw new EmailNotFoundException(MISSING_USER_EMAIL);

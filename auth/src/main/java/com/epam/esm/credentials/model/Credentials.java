@@ -38,6 +38,8 @@ public class Credentials implements UserDetails {
     @Type(value = PostgreSQLEnumType.class)
     @Builder.Default
     private Provider provider = Provider.LOCAL;
+    @Builder.Default
+    private Boolean isEnabled = false;
 
     @Override
     public boolean equals(Object o) {
@@ -49,7 +51,7 @@ public class Credentials implements UserDetails {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, email, password, role, provider);
+        return Objects.hash(id, email, password, role, provider, isEnabled);
     }
 
     @Override
@@ -59,12 +61,12 @@ public class Credentials implements UserDetails {
 
     @Override
     public String getPassword() {
-        return this.password;
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return this.email;
+        return email;
     }
 
     @Override
@@ -84,7 +86,11 @@ public class Credentials implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
+    }
+
+    public void enableAccount() {
+        isEnabled = true;
     }
 
     public Role getRole() {

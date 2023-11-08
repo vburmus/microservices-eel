@@ -46,6 +46,12 @@ public class AuthenticationController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/activate-account")
+    public ResponseEntity<Void> activateAccount(@RequestParam String token) {
+        authenticationService.activateAccount(token);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/user")
     public ResponseEntity<UserDTO> getUserFromJwt(@RequestHeader("Authorization") String bearerToken) {
         jwtService.validateToken(bearerToken);

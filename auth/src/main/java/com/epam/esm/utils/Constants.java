@@ -9,7 +9,7 @@ public class Constants {
     public static final String EPAM = "epam";
     public static final String NAME = "name";
     public static final String SURNAME = "surname";
-    public static final String TYPE = "tags";
+    public static final String TYPE = "type";
     public static final String ACCESS_TOKENS = "accessTokens";
     public static final String REFRESH_TOKENS = "refreshTokens";
     public static final String BLACK_LIST = "blackList";
