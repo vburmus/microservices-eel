@@ -19,4 +19,5 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui'
     implementation 'com.github.vburmus:auth-library'
     implementation "org.springframework.amqp:spring-rabbit"
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
