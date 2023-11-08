@@ -5,6 +5,10 @@ spring:
     url: ${SQL_URI}
     username: ${SQL_USERNAME}
     password: ${SQL_PASSWORD}
+  rabbitmq:
+    username: ${RABBIT_USER}
+    password: ${RABBIT_PASSWORD}
+    addresses: ${RABBIT_URI}
 server:
   port: 0
 eureka:
