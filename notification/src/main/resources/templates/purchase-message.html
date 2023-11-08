@@ -4,30 +4,22 @@
     <title></title>
 </head>
 <body style="font-family: 'Agency FB', sans-serif;width: 80%;margin: auto">
-<header style="text-align: center;background-image: linear-gradient(#00bbff,#ffffff);padding: 0.5rem;color:#ffffff">
+<header style="text-align: center;background-image: linear-gradient(#00bbff,#ffffff);padding: 1.5rem;color:#ffffff">
     <h1>Order confirmation</h1>
+    <h4
+            th:text="${#temporals.format(purchase.createDate, 'HH:mm')} + ' ' + ${#temporals.format(purchase.createDate, 'yyyy-MM-dd')}">
+        Date</h4>
 </header>
 <main style="padding: 2rem;">
-    <div style="display: flex;flex-wrap: wrap;justify-content: space-around;text-align: center;padding: 2rem">
-        <div style="width: 35%; ">
+        <div style="width: 50%; float: left; text-align: center">
             <h4>Number:</h4>
             <h4 th:text="${purchase.id}">number</h4>
         </div>
-        <div style="width: 30%;">
+        <div style="width: 50%;float: right;text-align: center">
             <h4>Summary:</h4>
             <h4 th:text="${purchase.cost}"><b>summary</b></h4>
         </div>
-        <div style="width: 35%;">
-            <h4>Date:</h4>
-            <h4 th:text="${#temporals.format(purchase.createDate, 'HH:mm')}">date</h4>
-            <h4 th:text="${#temporals.format(purchase.createDate, 'yyyy-MM-dd')}">date</h4>
-        </div>
-
-    </div>
-    <div style="text-align: center">
-        <h2>Your order:</h2>
-    </div>
-    <table style="border-collapse: collapse; width: 50rem;margin: auto; border: 1px solid grey;text-align: center;color:black">
+    <table style="border-collapse: collapse;margin: auto; width: 40rem;border: 1px solid grey;text-align: center;color:black">
         <tbody>
         <tr>
             <th style="padding: 10px; border: 1px solid grey;width: 30%">
