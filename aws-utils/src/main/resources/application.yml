@@ -16,3 +16,7 @@ eureka:
   client:
     serviceUrl:
       defaultZone: ${EUREKA_URI}
+management:
+  tracing:
+    sampling:
+      probability: 1.0

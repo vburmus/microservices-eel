@@ -14,3 +14,7 @@ eureka:
 logging:
   level:
    root: info
+management:
+  tracing:
+    sampling:
+      probability: 1.0
