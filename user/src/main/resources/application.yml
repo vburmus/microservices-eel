@@ -1,36 +1,7 @@
 spring:
-  application:
-    name: user-service
-  datasource:
-    username: ${SQL_USERNAME}
-    url: ${SQL_URI}
-    password: ${SQL_PASSWORD}
-  data:
-    web:
-      pageable:
-        default-page-size: 10
-  jpa:
-    hibernate:
-      ddl-auto: none
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: 'true'
-        show_sql: 'true'
+  config:
+    import: "configserver:"
   cloud:
-    openfeign:
-      client:
-        config:
-          default:
-            connectTimeout: 5000
-            readTimeout: 5000
-            loggerLevel: basic
-logging:
-  level:
-    root: info
-server:
-  port: 0
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URI}
+    config:
+      uri: ${CONFIGURATION_SERVER_URI}
+      name: user-service

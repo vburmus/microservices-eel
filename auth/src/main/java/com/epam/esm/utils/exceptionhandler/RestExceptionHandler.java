@@ -31,21 +31,21 @@ public class RestExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
-    @ExceptionHandler({ExpiredJwtException.class, SignatureException.class, BadCredentialsException.class,
+    @ExceptionHandler({ExpiredJwtException.class, SignatureException.class,
             MalformedJwtException.class})
-    public ResponseEntity<Problem> handleJwtExceptions(Exception e) {
+    public ResponseEntity<Problem> handleJwtExceptions(RuntimeException e) {
         Problem problem = buildProblem(Status.UNAUTHORIZED, AUTHENTICATION_EXCEPTION, e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
     }
 
-    @ExceptionHandler(EmailNotFoundException.class)
-    public ResponseEntity<Problem> handleEmailNotFoundException(EmailNotFoundException ex) {
-        Problem problem = buildProblem(Status.BAD_REQUEST, CREDENTIALS_ERROR, ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Problem> handleBadCredentials() {
+        Problem problem = buildProblem(Status.UNAUTHORIZED, AUTHENTICATION_EXCEPTION, WRONG_EMAIL_OR_PASSWORD);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
     }
 
-    @ExceptionHandler(EmailAlreadyRegisteredException.class)
-    public ResponseEntity<Problem> handleEmailAlreadyRegisteredException(EmailAlreadyRegisteredException ex) {
+    @ExceptionHandler({EmailNotFoundException.class, EmailAlreadyRegisteredException.class})
+    public ResponseEntity<Problem> handleEmailNotFoundException(EmailNotFoundException ex) {
         Problem problem = buildProblem(Status.BAD_REQUEST, CREDENTIALS_ERROR, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
@@ -57,8 +57,8 @@ public class RestExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }
 
-    @ExceptionHandler({InvalidTokenException.class, TokenRequiredException.class})
-    public ResponseEntity<Problem> handleTokenExceptions(InvalidTokenException ex) {
+    @ExceptionHandler({InvalidTokenException.class, TokenRequiredException.class, AccountIsActiveException.class})
+    public ResponseEntity<Problem> handleTokenExceptions(RuntimeException ex) {
         Problem problem = buildProblem(Status.BAD_REQUEST, TOKEN_ERROR, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }

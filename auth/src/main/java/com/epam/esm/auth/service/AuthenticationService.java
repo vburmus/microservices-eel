@@ -7,11 +7,13 @@ import com.epam.esm.model.UserDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AuthenticationService {
-    TokenDTO register(RegisterRequest request, MultipartFile image);
+    String register(RegisterRequest request, MultipartFile image);
 
     TokenDTO authenticate(AuthenticationRequest request);
 
     String refreshToken(String jwt);
 
     UserDTO decodeUserFromJwt(String jwt);
+
+    void activateAccount(String token);
 }

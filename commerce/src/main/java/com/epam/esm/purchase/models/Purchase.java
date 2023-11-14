@@ -30,10 +30,12 @@ public class Purchase {
     private BigDecimal cost;
     @CreatedDate
     @Column(name = "create_date")
-    private LocalDateTime createDate;
+    @Builder.Default
+    private LocalDateTime createDate = LocalDateTime.now();
     @LastModifiedDate
     @Column(name = "last_update_date")
-    private LocalDateTime lastUpdateDate;
+    @Builder.Default
+    private LocalDateTime lastUpdateDate = LocalDateTime.now();
     @Column(nullable = false)
     private Long userId;
     @OneToMany(mappedBy = "purchase")

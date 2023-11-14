@@ -9,7 +9,7 @@ public class Constants {
     public static final String EPAM = "epam";
     public static final String NAME = "name";
     public static final String SURNAME = "surname";
-    public static final String TYPE = "tags";
+    public static final String TYPE = "type";
     public static final String ACCESS_TOKENS = "accessTokens";
     public static final String REFRESH_TOKENS = "refreshTokens";
     public static final String BLACK_LIST = "blackList";
@@ -36,4 +36,5 @@ public class Constants {
     public static final String CREDENTIALS_ERROR = "Credentials Error";
     public static final String TOKEN_ERROR = "Invalid Token Error";
     public static final String USER_NOT_EXIST_EMAIL = "User with email %s not found";
+    public static final String INVALID_VALIDATION_TOKEN = "Invalid validation token";
 }

@@ -12,6 +12,8 @@ import com.epam.esm.purchasecertificate.model.PurchaseCertificate;
 import com.epam.esm.purchasecertificate.model.PurchaseCertificatePK;
 import com.epam.esm.purchasecertificate.repository.PurchaseCertificateRepository;
 import com.epam.esm.utils.EntityToDtoMapper;
+import com.epam.esm.utils.amqp.MessagePublisher;
+import com.epam.esm.utils.amqp.PurchaseCreationMessage;
 import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchObjectException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -36,23 +37,28 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final PurchaseCertificateRepository purchaseCertificateRepository;
     private final CertificateService certificateService;
     private final EntityToDtoMapper entityToDtoMapper;
+    private final MessagePublisher messagePublisher;
 
     @Transactional
     public PurchaseDTO create(PurchaseCreationRequest purchaseCreationRequest) {
         Map<Certificate, Integer> certificateQuantityMap = createCertificateQuantityMap(purchaseCreationRequest);
         UserDTO user = (UserDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        LocalDateTime now = LocalDateTime.now();
+
         Purchase savedPurchase = purchaseRepository.save(
                 Purchase.builder()
                         .userId(user.getId())
                         .description(purchaseCreationRequest.description())
                         .cost(getPurchaseCost(certificateQuantityMap))
-                        .createDate(now)
-                        .lastUpdateDate(now)
                         .build());
         Set<PurchaseCertificate> purchaseCertificates = createPurchaseCertificateSet(certificateQuantityMap,
                 savedPurchase);
         savedPurchase.setPurchaseCertificates(purchaseCertificates);
+
+        PurchaseCreationMessage message = PurchaseCreationMessage.builder()
+                .email(user.getEmail())
+                .purchaseDTO(entityToDtoMapper.toPurchaseDTO(savedPurchase))
+                .build();
+        messagePublisher.publishMessage(message);
         return entityToDtoMapper.toPurchaseDTO(savedPurchase);
     }
 

@@ -1,0 +1,7 @@
+spring:
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      uri: ${CONFIGURATION_SERVER_URI}
+      name: notification-service

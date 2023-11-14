@@ -27,8 +27,8 @@ public class AuthenticationController {
     private final JwtService jwtService;
 
     @PostMapping(path = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<TokenDTO> register(@Valid @RequestPart("request") RegisterRequest request,
-                                             @RequestPart("image") @Nullable MultipartFile image) {
+    public ResponseEntity<String> register(@Valid @RequestPart("request") RegisterRequest request,
+                                           @RequestPart("image") @Nullable MultipartFile image) {
         return ResponseEntity.ok(authenticationService.register(request, image));
     }
 
@@ -43,6 +43,12 @@ public class AuthenticationController {
         jwtService.validateToken(bearerToken);
         String newAccessToken = authenticationService.refreshToken(bearerToken.substring(7));
         response.setHeader(AUTHORIZATION_HEADER, AUTHENTICATION_BEARER_TOKEN + newAccessToken);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/activate-account")
+    public ResponseEntity<Void> activateAccount(@RequestParam String token) {
+        authenticationService.activateAccount(token);
         return ResponseEntity.noContent().build();
     }
 
