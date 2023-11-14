@@ -1,26 +1,7 @@
 spring:
-  application:
-    name: notification-service
-  rabbitmq:
-    username: ${RABBIT_USER}
-    password: ${RABBIT_PASSWORD}
-    addresses: ${RABBIT_URI}
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    password: ${MAIL_SECRET}
-    username: ${MAIL_ADDRESS}
-    default-encoding: UTF-8
-    properties:
-      mail:
-        transport:
-          protocol: smtp
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-server:
-  port: 0
-logging:
-  level:
-    root: info
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      uri: ${CONFIGURATION_SERVER_URI}
+      name: notification-service
