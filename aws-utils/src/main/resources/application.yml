@@ -1,22 +1,7 @@
 spring:
-  application:
-    name: aws-utils
-logging:
-  level:
-    root: debug
-server:
-  port: 0
-aws:
-  access: ${AWS_ACCESS}
-  secret: ${AWS_SECRET}
-  content:
-    bucket:
-      name: ${AWS_CONTENT_BUCKET}
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URI}
-management:
-  tracing:
-    sampling:
-      probability: 1.0
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      uri: { CONFIGURATION_SERVER_URI }
+      name: aws-utils-service

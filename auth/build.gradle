@@ -19,4 +19,6 @@ dependencies {
     implementation 'io.hypersistence:hypersistence-utils-hibernate-62'
     implementation 'com.github.ben-manes.caffeine:caffeine'
     implementation 'com.github.vburmus:auth-library'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

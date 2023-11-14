@@ -1,20 +1,7 @@
 spring:
-  application:
-    name: auth-service
-  datasource:
-    url: ${SQL_URI}
-    username: ${SQL_USERNAME}
-    password: ${SQL_PASSWORD}
-server:
-  port: 0
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URI}
-logging:
-  level:
-   root: info
-management:
-  tracing:
-    sampling:
-      probability: 1.0
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      uri: { CONFIGURATION_SERVER_URI }
+      name: auth-service
