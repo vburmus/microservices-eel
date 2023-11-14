@@ -1,20 +1,7 @@
 spring:
-  application:
-    name: auth-service
-  datasource:
-    url: ${SQL_URI}
-    username: ${SQL_USERNAME}
-    password: ${SQL_PASSWORD}
-  rabbitmq:
-    username: ${RABBIT_USER}
-    password: ${RABBIT_PASSWORD}
-    addresses: ${RABBIT_URI}
-server:
-  port: 0
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URI}
-logging:
-  level:
-   root: info
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      uri: { CONFIGURATION_SERVER_URI }
+      name: auth-service
