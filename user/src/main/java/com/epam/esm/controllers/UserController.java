@@ -49,10 +49,4 @@ public class UserController {
             JsonProcessingException {
         return ResponseEntity.ok(userService.update(id, patch, image));
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") long id) {
-        userService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
 }

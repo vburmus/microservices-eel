@@ -19,5 +19,7 @@ dependencies {
     implementation 'io.hypersistence:hypersistence-utils-hibernate-62'
     implementation 'com.github.vburmus:auth-library'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation "org.springframework.amqp:spring-rabbit"
+    implementation "org.springframework.boot:spring-boot-starter-amqp"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

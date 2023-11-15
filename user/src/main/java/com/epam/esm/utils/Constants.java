@@ -25,4 +25,5 @@ public class Constants {
     public static final String PHONE_CAN_T_BE_BLANK = "Phone can't be blank";
     public static final String EMAIL_BE_LESS_THAN_255_CHARS = "Email be less than 255 chars";
     public static final String EMAIL_CAN_T_BE_BLANK = "Email can't be blank";
+    public static final String OPERATION_NOT_ALLOWED = "Operation not allowed";
 }
