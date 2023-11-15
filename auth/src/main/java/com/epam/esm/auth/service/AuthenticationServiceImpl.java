@@ -41,12 +41,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Transactional
     public String register(RegisterRequest request, MultipartFile image) {
-        credentialsService.create(request);
-        UserDTO user = userClient.create(entityToDtoMapper.toUserCreationRequest(request), image);
-        user.setRole(Role.USER);
+        Credentials credentials;
+        UserDTO user;
+        try {
+            credentials = credentialsService.getByEmail(request.email());
+            user = userClient.getByEmail(credentials.getUsername());
+        } catch (EmailNotFoundException e) {
+            credentials = credentialsService.create(request);
+            user = userClient.create(entityToDtoMapper.toUserCreationRequest(request), image);
+            user.setRole(Role.USER);
+        }
         String token = tokenGenerator.createValidationToken(user);
         EmailValidationMessage evm = EmailValidationMessage.builder()
-                .email(user.getEmail())
+                .email(credentials.getUsername())
                 .activationUrl(verificationUrl + "?token=" + token)
                 .build();
         messagePublisher.publishValidateEmailMessage(evm);

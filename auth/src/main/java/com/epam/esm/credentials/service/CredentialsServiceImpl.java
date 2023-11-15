@@ -30,7 +30,7 @@ public class CredentialsServiceImpl implements CredentialsService {
 
 
     @Override
-    public void create(RegisterRequest request) {
+    public Credentials create(RegisterRequest request) {
         credentialsRepository.findByEmail(request.email()).ifPresent(req -> {
             throw new EmailAlreadyRegisteredException(EMAIL_IS_ALREADY_REGISTERED);
         });
@@ -38,7 +38,13 @@ public class CredentialsServiceImpl implements CredentialsService {
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .build();
-        credentialsRepository.save(credentials);
+        return credentialsRepository.save(credentials);
+    }
+
+    @Override
+    public Credentials getByEmail(String email) {
+        return credentialsRepository.findByEmail(email)
+                .orElseThrow(() -> new EmailNotFoundException(USER_NOT_EXIST_EMAIL));
     }
 
     @Override
