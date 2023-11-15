@@ -17,7 +17,7 @@ import java.util.Objects;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     private String name;
     private String surname;
     private String phone;
@@ -34,6 +34,6 @@ public class User {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id,name,surname,phone,email,imageUrl);
+        return Objects.hash(id, name, surname, phone, email, imageUrl);
     }
 }
