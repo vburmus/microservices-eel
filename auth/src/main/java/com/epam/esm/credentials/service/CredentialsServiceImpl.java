@@ -38,4 +38,17 @@ public class CredentialsServiceImpl implements CredentialsService {
         if (credentials.isEnabled()) throw new AccountIsActiveException();
         credentials.enableAccount();
     }
+
+    @Override
+    public void delete(String email) {
+        Credentials authenticationCredentials =
+                (Credentials) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(authenticationCredentials.getUsername().equals(email) || authenticationCredentials.getRole().equals(ADMIN))) {
+            throw new AccessDeniedException(ACCESS_DENIED);
+        }
+        Credentials credentials =
+                credentialsRepository.findByEmail(email).orElseThrow(() -> new EmailNotFoundException(USER_NOT_EXIST_EMAIL));
+        credentialsRepository.delete(credentials);
+        messagePublisher.publishUserDeletionMessage(credentials.getUsername());
+    }
 }

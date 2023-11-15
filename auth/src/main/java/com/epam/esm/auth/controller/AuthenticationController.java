@@ -52,6 +52,12 @@ public class AuthenticationController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/delete-account")
+    public ResponseEntity<Void> deleteAccount(@RequestParam("email") String email) {
+        credentialsService.delete(email);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/user")
     public ResponseEntity<UserDTO> getUserFromJwt(@RequestHeader("Authorization") String bearerToken) {
         jwtService.validateToken(bearerToken);

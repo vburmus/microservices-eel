@@ -19,10 +19,18 @@ public class MQConfig {
     private final ObjectMapper objectMapper;
     @Value("${user.queue}")
     private String userQueue;
-    @Value("${user.exchange}")
-    private String userExchange;
-    @Value("${user.key}")
-    private String routingKey;
+
+    @Value("${user.validation.exchange}")
+    private String emailValidationExchange;
+
+    @Value("${user.validation.key}")
+    private String emailValidationRoutingKey;
+
+    @Value("${user.deletion.exchange}")
+    private String userDeletionExchange;
+
+    @Value("${user.deletion.key}")
+    private String userDeletionRoutingKey;
 
     @Bean
     public Queue queue() {
@@ -30,13 +38,23 @@ public class MQConfig {
     }
 
     @Bean
-    public TopicExchange exchange() {
-        return new TopicExchange(userExchange);
+    public TopicExchange emailValidationExchange() {
+        return new TopicExchange(emailValidationExchange);
     }
 
     @Bean
-    public Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(routingKey);
+    public TopicExchange userDeletionExchange() {
+        return new TopicExchange(userDeletionExchange);
+    }
+
+    @Bean
+    public Binding emailValidationBinding(Queue queue, TopicExchange emailValidationExchange) {
+        return BindingBuilder.bind(queue).to(emailValidationExchange).with(emailValidationRoutingKey);
+    }
+
+    @Bean
+    public Binding userDeletionBinding(Queue queue, TopicExchange userDeletionExchange) {
+        return BindingBuilder.bind(queue).to(userDeletionExchange).with(userDeletionRoutingKey);
     }
 
     @Bean

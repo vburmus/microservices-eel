@@ -8,4 +8,6 @@ public interface CredentialsService {
     void createCredentials(RegisterRequest request);
 
     void activateAccount(String email);
+
+    void delete(String id);
 }

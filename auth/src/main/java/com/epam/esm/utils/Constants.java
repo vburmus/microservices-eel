@@ -37,4 +37,5 @@ public class Constants {
     public static final String TOKEN_ERROR = "Invalid Token Error";
     public static final String USER_NOT_EXIST_EMAIL = "User with email %s not found";
     public static final String INVALID_VALIDATION_TOKEN = "Invalid validation token";
+    public static final String ACCESS_DENIED = "Access denied";
 }
