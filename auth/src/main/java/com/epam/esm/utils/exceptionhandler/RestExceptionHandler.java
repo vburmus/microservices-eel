@@ -45,7 +45,7 @@ public class RestExceptionHandler {
     }
 
     @ExceptionHandler({EmailNotFoundException.class, EmailAlreadyRegisteredException.class})
-    public ResponseEntity<Problem> handleEmailNotFoundException(EmailNotFoundException ex) {
+    public ResponseEntity<Problem> handleEmailNotFoundException(RuntimeException ex) {
         Problem problem = buildProblem(Status.BAD_REQUEST, CREDENTIALS_ERROR, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }

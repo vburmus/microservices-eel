@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface CredentialsService {
-    void createCredentials(RegisterRequest request);
+    void create(RegisterRequest request);
 
     void activateAccount(String email);
 
