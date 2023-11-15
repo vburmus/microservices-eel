@@ -1,7 +1,7 @@
 package com.epam.esm.service;
 
 import com.epam.esm.models.RegisterRequest;
-import com.epam.esm.models.UserDTO;
+import com.epam.esm.models.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
@@ -9,18 +9,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
-
 
 public interface UserService {
-    UserDTO create(RegisterRequest registerRequest, Optional<MultipartFile> image);
+    UserResponse create(RegisterRequest registerRequest, MultipartFile image);
 
-    Page<UserDTO> readAll(Pageable pageable);
+    Page<UserResponse> readAll(Pageable pageable);
 
-    UserDTO getByEmail(String email);
+    UserResponse getByEmail(String email);
 
-    UserDTO update(Long id, JsonMergePatch jsonPatch, Optional<MultipartFile> image) throws JsonPatchException,
+    UserResponse update(Long id, JsonMergePatch jsonPatch, MultipartFile image) throws JsonPatchException,
             JsonProcessingException;
 
-    void delete(Long id);
+    void delete(String email);
 }

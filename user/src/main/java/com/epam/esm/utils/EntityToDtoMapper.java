@@ -2,7 +2,7 @@ package com.epam.esm.utils;
 
 import com.epam.esm.models.RegisterRequest;
 import com.epam.esm.models.User;
-import com.epam.esm.models.UserDTO;
+import com.epam.esm.models.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -12,5 +12,5 @@ public interface EntityToDtoMapper {
     @Mapping(target = "imageUrl", ignore = true)
     User toUser(RegisterRequest registerRequest);
 
-    UserDTO toUserDTO(User userDTO);
+    UserResponse toUserResponse(User user);
 }

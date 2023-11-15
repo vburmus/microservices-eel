@@ -6,7 +6,6 @@ import com.epam.esm.auth.models.TokenDTO;
 import com.epam.esm.credentials.model.Credentials;
 import com.epam.esm.credentials.service.CredentialsService;
 import com.epam.esm.credentials.service.CustomUserCredentialsService;
-import com.epam.esm.jwt.TokenType;
 import com.epam.esm.jwt.service.JwtService;
 import com.epam.esm.jwt.service.TokenGenerator;
 import com.epam.esm.model.Role;
@@ -15,7 +14,6 @@ import com.epam.esm.utils.EntityToDtoMapper;
 import com.epam.esm.utils.amqp.EmailValidationMessage;
 import com.epam.esm.utils.amqp.MessagePublisher;
 import com.epam.esm.utils.exceptionhandler.exceptions.EmailNotFoundException;
-import com.epam.esm.utils.exceptionhandler.exceptions.InvalidTokenException;
 import com.epam.esm.utils.openfeign.UserFeignClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import static com.epam.esm.utils.Constants.INVALID_VALIDATION_TOKEN;
 import static com.epam.esm.utils.Constants.MISSING_USER_EMAIL;
 
 @Service
@@ -44,15 +41,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Transactional
     public String register(RegisterRequest request, MultipartFile image) {
-        credentialsService.createCredentials(request);
-        UserDTO user = userClient.create(entityToDtoMapper.toUserCreationRequest(request), image);
-        user.setRole(Role.USER);
+        Credentials credentials;
+        UserDTO user;
+        try {
+            credentials = credentialsService.getByEmail(request.email());
+            user = userClient.getByEmail(credentials.getUsername());
+        } catch (EmailNotFoundException e) {
+            credentials = credentialsService.create(request);
+            user = userClient.create(entityToDtoMapper.toUserCreationRequest(request), image);
+            user.setRole(Role.USER);
+        }
         String token = tokenGenerator.createValidationToken(user);
         EmailValidationMessage evm = EmailValidationMessage.builder()
-                .email(user.getEmail())
+                .email(credentials.getUsername())
                 .activationUrl(verificationUrl + "?token=" + token)
                 .build();
-        messagePublisher.publishMessage(evm);
+        messagePublisher.publishValidateEmailMessage(evm);
         return token;
     }
 
@@ -76,16 +80,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setRole(credentials.getRole());
         user.setProvider(credentials.getProvider());
         return user;
-    }
-
-    @Override
-    @Transactional
-    public void activateAccount(String token) {
-        String email = jwtService.extractUsername(token);
-        if (jwtService.extractType(token) != TokenType.EMAIL_VALIDATION || email.isEmpty()) {
-            throw new InvalidTokenException(INVALID_VALIDATION_TOKEN);
-        }
-        credentialsService.activateAccount(email);
     }
 
     private UserDTO getUserFromJwt(String jwt) {
