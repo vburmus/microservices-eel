@@ -34,7 +34,7 @@ public class SecurityConfig {
                                         "/api/v1/users").hasAuthority(ADMIN)
                                 .requestMatchers(
                                         HttpMethod.GET,
-                                        "/api/v1/users/**").anonymous()
+                                        "/api/v1/users/**").permitAll()
                                 .requestMatchers(
                                         HttpMethod.POST,
                                         "/api/v1/users").anonymous()

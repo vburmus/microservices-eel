@@ -1,12 +1,12 @@
 package com.epam.esm.service;
 
+import com.epam.esm.model.AuthenticatedUser;
 import com.epam.esm.model.Role;
-import com.epam.esm.model.UserDTO;
-import com.epam.esm.models.RegisterRequest;
 import com.epam.esm.models.User;
 import com.epam.esm.models.UserResponse;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.utils.EntityToDtoMapper;
+import com.epam.esm.utils.ampq.CreateUserRequest;
 import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchUserException;
 import com.epam.esm.utils.exceptionhandler.exceptions.UserAlreadyExistException;
 import com.epam.esm.utils.exceptionhandler.exceptions.UserUpdateException;
@@ -39,13 +39,13 @@ public class UserServiceImpl implements UserService {
     private String defaultImageUrl;
 
     @Transactional
-    public UserResponse create(RegisterRequest registerRequest, MultipartFile image) {
-        userRepository.findByEmail(registerRequest.email()).ifPresent(user -> {
-            throw new UserAlreadyExistException(String.format(ALREADY_REGISTERED, registerRequest.email()));
+    public void create(CreateUserRequest registerRequest) {
+        userRepository.findByEmail(registerRequest.getEmail()).ifPresent(user -> {
+            throw new UserAlreadyExistException(String.format(ALREADY_REGISTERED, registerRequest.getEmail()));
         });
         User user = entityToDtoMapper.toUser(registerRequest);
-        user.setImageUrl(image == null ? defaultImageUrl : awsClient.uploadImage(USERS, image));
-        return entityToDtoMapper.toUserResponse(userRepository.save(user));
+        user.setImageUrl(defaultImageUrl);
+        userRepository.save(user);
     }
 
     public Page<UserResponse> readAll(Pageable pageable) {
@@ -55,6 +55,11 @@ public class UserServiceImpl implements UserService {
     public UserResponse getByEmail(String email) {
         return userRepository.findByEmail(email).map(entityToDtoMapper::toUserResponse)
                 .orElseThrow(() -> new NoSuchUserException(String.format(USER_DOESNT_EXIST_EMAIL, email)));
+    }
+
+    public UserResponse getById(Long id) {
+        return userRepository.findById(id).map(entityToDtoMapper::toUserResponse)
+                .orElseThrow(() -> new NoSuchUserException(String.format(USER_DOESNT_EXIST_ID, id)));
     }
 
     @Transactional
@@ -84,7 +89,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean checkIfOperationRestricted(Long id) {
-        UserDTO authenticatedUser = (UserDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        AuthenticatedUser authenticatedUser =
+                (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return !authenticatedUser.getId().equals(id) && !authenticatedUser.getRole().equals(Role.ADMIN);
     }
 
