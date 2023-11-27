@@ -3,6 +3,8 @@ package com.epam.esm.utils.config.security;
 import com.epam.esm.credentials.model.Credentials;
 import com.epam.esm.credentials.service.CustomUserCredentialsService;
 import com.epam.esm.jwt.service.JwtService;
+import com.google.gson.JsonObject;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,14 +18,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
 
-import static com.epam.esm.utils.AuthConstants.AUTHENTICATION_BEARER_TOKEN;
+import static com.epam.esm.utils.AuthConstants.*;
 
 @RequiredArgsConstructor
 @Component
@@ -48,10 +48,14 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                             Collections.singleton(new SimpleGrantedAuthority(credentials.getRole().name())));
             SecurityContextHolder.getContext().setAuthentication(authToken);
             filterChain.doFilter(request, response);
-        } catch (HttpClientErrorException | HttpServerErrorException e) {
-            int statusCode = e.getStatusCode().value();
-            response.setStatus(statusCode);
+        } catch (ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            JsonObject errorJson = new JsonObject();
+            errorJson.addProperty(TITLE, AUTHENTICATION_EXCEPTION);
+            errorJson.addProperty(STATUS, HttpServletResponse.SC_UNAUTHORIZED);
+            errorJson.addProperty(DETAIL, "Token expired");
+            response.getWriter().write(errorJson.toString());
         }
     }
 }
