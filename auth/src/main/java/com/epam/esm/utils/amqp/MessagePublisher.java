@@ -17,6 +17,14 @@ public class MessagePublisher {
     private String userDeletionExchange;
     @Value("${user.deletion.key}")
     private String userDeletionRoutingKey;
+    @Value("${user.creation.exchange}")
+    private String userCreationExchange;
+    @Value("${user.creation.key}")
+    private String userCreationRoutingKey;
+    @Value("${user.image.exchange}")
+    private String userImageExchange;
+    @Value("${user.image.key}")
+    private String userImageRoutingKey;
 
     public void publishValidateEmailMessage(EmailValidationMessage message) {
         template.convertAndSend(emailValidationExchange, emailValidationRoutingKey, message);
@@ -24,5 +32,13 @@ public class MessagePublisher {
 
     public void publishUserDeletionMessage(String email) {
         template.convertAndSend(userDeletionExchange, userDeletionRoutingKey, email);
+    }
+
+    public void publishUserCreationMessage(CreateUserRequest request) {
+        template.convertAndSend(userCreationExchange, userCreationRoutingKey, request);
+    }
+
+    public void publishImage(ImageUploadRequest request) {
+        template.convertAndSend(userImageExchange, userImageRoutingKey, request);
     }
 }

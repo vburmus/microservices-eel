@@ -72,4 +72,9 @@ public class CredentialsServiceImpl implements CredentialsService {
         credentialsRepository.delete(credentials);
         messagePublisher.publishUserDeletionMessage(credentials.getUsername());
     }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return credentialsRepository.existsByEmail(email);
+    }
 }

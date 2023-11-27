@@ -12,5 +12,7 @@ public interface CredentialsService {
 
     void activateAccount(String email);
 
+    boolean existsByEmail(String email);
+
     void delete(String id);
 }
