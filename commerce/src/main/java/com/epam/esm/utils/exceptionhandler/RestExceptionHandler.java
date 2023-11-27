@@ -39,8 +39,8 @@ public class RestExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
-    @ExceptionHandler(CertificateUpdateException.class)
-    public ResponseEntity<Problem> handleCertificateUpdateException(CertificateUpdateException e) {
+    @ExceptionHandler(UpdateException.class)
+    public ResponseEntity<Problem> handleCertificateUpdateException(UpdateException e) {
         Problem problem = buildProblem(Status.BAD_REQUEST, UPDATE_ERROR, e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }

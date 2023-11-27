@@ -7,7 +7,13 @@ import com.epam.esm.tag.repository.TagRepository;
 import com.epam.esm.utils.EntityToDtoMapper;
 import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchObjectException;
 import com.epam.esm.utils.exceptionhandler.exceptions.ObjectAlreadyExists;
+import com.epam.esm.utils.exceptionhandler.exceptions.UpdateException;
 import com.epam.esm.utils.openfeign.AwsUtilsFeignClient;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatchException;
+import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -28,9 +34,11 @@ public class TagServiceImpl implements TagService {
     private final TagRepository tagRepository;
     private final EntityToDtoMapper entityToDtoMapper;
     private final AwsUtilsFeignClient awsClient;
+    private final ObjectMapper objectMapper;
     @Value("${tag.default.image.url}")
     private String defaultImageUrl;
 
+    @Override
     @Transactional
     public TagDTO create(TagDTO tagDTO, Optional<MultipartFile> image) {
         if (tagRepository.existsByName(tagDTO.name()))
@@ -43,20 +51,24 @@ public class TagServiceImpl implements TagService {
         return entityToDtoMapper.toTagDTO(tagRepository.save(tag));
     }
 
+    @Override
     public Page<TagDTO> readAll(Pageable pageable) {
         return tagRepository.findAll(pageable).map(entityToDtoMapper::toTagDTO);
     }
 
+    @Override
     public TagDTO getById(long id) {
         return tagRepository.findById(id)
                 .map(entityToDtoMapper::toTagDTO)
                 .orElseThrow(() -> new NoSuchObjectException(String.format(TAG_DOESNT_EXIST_ID, id)));
     }
 
+    @Override
     public Page<TagDTO> getByNamePart(String namePart, Pageable pageable) {
         return tagRepository.getByNameContaining(namePart, pageable).map(entityToDtoMapper::toTagDTO);
     }
 
+    @Override
     public void delete(long id) {
         tagRepository.findById(id)
                 .ifPresentOrElse(
@@ -67,6 +79,20 @@ public class TagServiceImpl implements TagService {
                 );
     }
 
+    @Override
+    public TagDTO update(long id, JsonMergePatch jsonPatch, MultipartFile image) throws JsonPatchException,
+            JsonProcessingException {
+        Tag tag = tagRepository.findById(id)
+                .orElseThrow(() -> new NoSuchObjectException(String.format(CERTIFICATE_DOES_NOT_EXISTS_ID, id)));
+        JsonNode patched = jsonPatch.apply(objectMapper.convertValue(tag, JsonNode.class));
+        Tag updatedTag = objectMapper.treeToValue(patched, Tag.class);
+        if (updatedTag == null) throw new UpdateException(UPDATE_TAG_IS_NULL);
+        tag.setName(updatedTag.getName());
+        if (image != null) tag.setImageUrl(awsClient.uploadImage(TAGS, image));
+        return entityToDtoMapper.toTagDTO(tagRepository.save(tag));
+    }
+
+    @Override
     public List<Tag> checkTagsAndFetch(List<Tag> tags) {
         List<Tag> fetchedTags = new ArrayList<>();
         for (Tag tag : tags) {
