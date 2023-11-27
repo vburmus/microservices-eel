@@ -8,8 +8,7 @@ import com.epam.esm.credentials.service.CredentialsService;
 import com.epam.esm.credentials.service.CustomUserCredentialsService;
 import com.epam.esm.jwt.service.JwtService;
 import com.epam.esm.jwt.service.TokenGenerator;
-import com.epam.esm.model.Role;
-import com.epam.esm.model.UserDTO;
+import com.epam.esm.model.AuthenticatedUser;
 import com.epam.esm.utils.EntityToDtoMapper;
 import com.epam.esm.utils.amqp.EmailValidationMessage;
 import com.epam.esm.utils.amqp.MessagePublisher;
@@ -61,30 +60,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     public TokenDTO authenticate(AuthenticationRequest request) {
-        UserDTO user = userClient.getByEmail(request.email());
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(),
                 request.password()));
         Credentials credentials = userDetailsService.loadUserByUsername(request.email());
-        user.setRole(credentials.getRole());
-        return tokenGenerator.createToken(user);
+        return tokenGenerator.createToken(credentials);
     }
 
     public String refreshToken(String jwt) {
-        UserDTO user = getUserFromJwt(jwt);
-        return tokenGenerator.createAccessToken(user);
+        String email = jwtService.extractUsername(jwt);
+        Credentials credentials = userDetailsService.loadUserByUsername(email);
+        return tokenGenerator.createAccessToken(credentials);
     }
 
-    public UserDTO decodeUserFromJwt(String jwt) {
-        UserDTO user = getUserFromJwt(jwt);
-        Credentials credentials = userDetailsService.loadUserByUsername(user.getEmail());
-        user.setRole(credentials.getRole());
-        user.setProvider(credentials.getProvider());
-        return user;
-    }
-
-    private UserDTO getUserFromJwt(String jwt) {
+    public AuthenticatedUser decodeUserFromJwt(String jwt) {
         String email = jwtService.extractUsername(jwt);
         if (email == null) throw new EmailNotFoundException(MISSING_USER_EMAIL);
-        return userClient.getByEmail(email);
+        return entityToDtoMapper.toAuthenticatedUser(credentialsService.getByEmail(email));
     }
 }

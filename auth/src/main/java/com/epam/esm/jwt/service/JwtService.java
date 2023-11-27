@@ -1,8 +1,8 @@
 package com.epam.esm.jwt.service;
 
 
+import com.epam.esm.credentials.model.Credentials;
 import com.epam.esm.jwt.TokenType;
-import com.epam.esm.model.UserDTO;
 import com.epam.esm.utils.exceptionhandler.exceptions.CacheException;
 import com.epam.esm.utils.exceptionhandler.exceptions.IncorrectTokenTypeException;
 import com.epam.esm.utils.exceptionhandler.exceptions.InvalidTokenException;
@@ -118,12 +118,10 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createSignedJwt(UserDTO user, TokenType tokenType) {
+    public String createSignedJwt(Credentials user, TokenType tokenType) {
         return Jwts.builder()
                 .claim(ID, user.getId())
-                .setSubject(user.getEmail())
-                .claim(NAME, user.getName())
-                .claim(SURNAME, user.getSurname())
+                .setSubject(user.getUsername())
                 .claim(ROLE, user.getRole())
                 .claim(TYPE, tokenType)
                 .setIssuer(EPAM)

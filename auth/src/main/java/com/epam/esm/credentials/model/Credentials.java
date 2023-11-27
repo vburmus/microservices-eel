@@ -93,6 +93,10 @@ public class Credentials implements UserDetails {
         isEnabled = true;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public Role getRole() {
         return role;
     }
