@@ -8,22 +8,27 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.epam.esm.utils.ampq.ImageUploadRequest;
+import com.epam.esm.utils.ampq.ImageUploadResponse;
+import com.epam.esm.utils.ampq.MessagePublisher;
 import com.epam.esm.utils.exceptionhandler.exceptions.FileUploadException;
-import com.epam.esm.utils.Validation;
-import io.swagger.v3.oas.annotations.Parameter;
+import com.epam.esm.utils.exceptionhandler.exceptions.NullableFileException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.UUID;
 
-import static com.epam.esm.utils.Constants.DIRECTORY_SWAGGER_DESCRIPTION;
+import static com.epam.esm.utils.Constants.EXTENSION;
+import static com.epam.esm.utils.Constants.FILE_CAN_T_BE_NULL;
 
 @Service
+@RequiredArgsConstructor
 public class AwsUtilsService {
+    private final MessagePublisher messagePublisher;
     @Value("${aws.access}")
     private String accessKey;
     @Value("${aws.secret}")
@@ -31,16 +36,21 @@ public class AwsUtilsService {
     @Value("${aws.content.bucket.name}")
     private String bucketName;
 
-    public String loadImage(@Parameter(description = DIRECTORY_SWAGGER_DESCRIPTION) String directory,
-                            MultipartFile image) {
-        String extension = Validation.validateImage(image);
-        try (InputStream imageInputStream = image.getInputStream()) {
+    public void loadByteImage(ImageUploadRequest imageUploadRequest, String directory) {
+        byte[] imageBytes = imageUploadRequest.imageBytes();
+        if (imageBytes == null || imageBytes.length == 0) {
+            throw new NullableFileException(FILE_CAN_T_BE_NULL);
+        }
+        try (ByteArrayInputStream imageInputStream = new ByteArrayInputStream(imageBytes)) {
             Regions region = Regions.EU_NORTH_1;
             AmazonS3 s3Client = createS3Client(region);
-            ObjectMetadata metadata = createS3ObjectMetadata(image);
-            String objectKey = createS3ObjectKey(directory, extension);
+            ObjectMetadata metadata = createS3ObjectMetadata(imageBytes);
+            String objectKey = createS3ObjectKey(directory);
             s3Client.putObject(new PutObjectRequest(bucketName, objectKey, imageInputStream, metadata));
-            return createS3ObjectUrl(region, objectKey);
+            String imageURI = createS3ObjectUrl(region, objectKey);
+
+            ImageUploadResponse imageUploadResponse = new ImageUploadResponse(imageUploadRequest.userId(), imageURI);
+            messagePublisher.publishLoadedImageResponse(imageUploadResponse);
         } catch (AmazonS3Exception e) {
             throw new FileUploadException(e.getMessage(), e.getStatusCode());
         } catch (IOException e) {
@@ -60,15 +70,14 @@ public class AwsUtilsService {
                 .build();
     }
 
-    private ObjectMetadata createS3ObjectMetadata(MultipartFile image) {
+    private ObjectMetadata createS3ObjectMetadata(byte[] imageBytes) {
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(image.getContentType());
-        metadata.setContentLength(image.getSize());
+        metadata.setContentLength(imageBytes.length);
         return metadata;
     }
 
-    private String createS3ObjectKey(String directory, String extension) {
+    private String createS3ObjectKey(String directory) {
         String imageId = UUID.randomUUID().toString();
-        return directory + "/" + imageId + "." + extension;
+        return directory + "/" + imageId + "." + EXTENSION;
     }
 }

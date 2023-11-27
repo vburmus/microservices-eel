@@ -14,8 +14,9 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui'
     annotationProcessor 'org.projectlombok:lombok'
     compileOnly 'org.projectlombok:lombok'
+    implementation "org.springframework.amqp:spring-rabbit"
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
 }
 
 jib {
