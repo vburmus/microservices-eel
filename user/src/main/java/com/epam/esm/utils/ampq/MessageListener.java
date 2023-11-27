@@ -19,4 +19,9 @@ public class MessageListener {
     public void onUserCreation(CreateUserRequest request) {
         userService.create(request);
     }
+
+    @RabbitListener(queues = "${user.image.response.queue}")
+    public void onUserCreation(ImageUploadResponse response) {
+        userService.setUploadedImage(response);
+    }
 }

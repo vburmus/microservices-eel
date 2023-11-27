@@ -7,6 +7,7 @@ import com.epam.esm.models.UserResponse;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.utils.EntityToDtoMapper;
 import com.epam.esm.utils.ampq.CreateUserRequest;
+import com.epam.esm.utils.ampq.ImageUploadResponse;
 import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchUserException;
 import com.epam.esm.utils.exceptionhandler.exceptions.UserAlreadyExistException;
 import com.epam.esm.utils.exceptionhandler.exceptions.UserUpdateException;
@@ -86,6 +87,15 @@ public class UserServiceImpl implements UserService {
                     throw new NoSuchUserException(String.format(USER_DOESNT_EXIST_EMAIL, email));
                 }
         );
+    }
+
+    @Override
+    public void setUploadedImage(ImageUploadResponse imageUploadResponse) {
+        User user = userRepository.findById(imageUploadResponse.id())
+                .orElseThrow(() -> new NoSuchUserException(String.format(USER_DOESNT_EXIST_ID,
+                        imageUploadResponse.id())));
+        user.setImageUrl(imageUploadResponse.imageUrl());
+        userRepository.save(user);
     }
 
     private boolean checkIfOperationRestricted(Long id) {
