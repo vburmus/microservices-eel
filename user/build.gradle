@@ -1,3 +1,8 @@
+plugins{
+    id 'com.google.cloud.tools.jib' version '3.4.0'
+}
+project.version = 1.0
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -22,4 +27,14 @@ dependencies {
     implementation "org.springframework.amqp:spring-rabbit"
     implementation "org.springframework.boot:spring-boot-starter-amqp"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+jib {
+    from {
+        image = 'amazoncorretto:17-alpine'
+    }
+
+    to {
+        image = "vburmus/${project.name}:${project.version}"
+    }
 }
