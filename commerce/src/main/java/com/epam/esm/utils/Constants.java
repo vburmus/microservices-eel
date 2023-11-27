@@ -4,8 +4,6 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Constants {
-    public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
-    public static final String API_CALL_ERROR = "API Call Error";
     public static final String ALREADY_EXIST_ERROR = "Already Exist Error";
     public static final String INVALID_ITEM_ERROR = "Invalid Item Error";
     public static final String UPDATE_ERROR = "Update Error";
@@ -29,6 +27,7 @@ public class Constants {
     public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
     public static final String TAG_DOESNT_EXIST_NAME = "Tag with name %s doesn't exist";
     public static final String UPDATE_CERTIFICATE_IS_NULL = "Error updating certificate. Updated certificate is null.";
+    public static final String UPDATE_TAG_IS_NULL = "Error updating tag. Updated tag is null.";
     public static final String GET_GC_BY_TAGS_AND_PART =
             "SELECT DISTINCT id,name,short_description,long_description,price,image_url, duration_date," +
                     "create_date,last_update_date FROM " +
@@ -53,7 +52,6 @@ public class Constants {
     public static final String QUANTITY_CANNOT_BE_NULL = "Quantity cannot be null";
     public static final String QUANTITY_MUST_BE_GREATER_THAN_ZERO = "Quantity must be greater than zero";
     public static final String CERTIFICATE_ID_CANNOT_BE_NULL = "Certificate id cannot be null";
-    public static final String USER_ID_CANNOT_BE_EMPTY = "User Id cannot be empty";
     public static final String PURCHASE_SHOULD_CONTAIN_CERTIFICATES = "Purchase should contain certificates";
     public static final String DESCRIPTION_SHOULD_BE_LESS_THAN_255_CHARS = "Description should be less than 255 chars";
     public static final String NAME_SHOULD_BE_LESS_THAN_30_CHARS = "Name should be less than 30 chars";
