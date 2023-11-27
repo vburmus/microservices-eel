@@ -28,7 +28,12 @@ public class PurchaseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PurchaseDTO> getPurchaseByID(@PathVariable("id") long id) {
+    public ResponseEntity<PurchaseDTO> getById(@PathVariable("id") long id) {
         return ResponseEntity.ok(purchaseService.getById(id));
+    }
+    @GetMapping("/user/{id}")
+    public ResponseEntity<Page<PurchaseDTO>> getAllByUserId(@PathVariable("id") long userId,
+                                                            @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(purchaseService.getAllByUserId(userId,pageable));
     }
 }

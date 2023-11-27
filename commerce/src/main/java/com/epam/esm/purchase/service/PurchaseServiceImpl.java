@@ -2,7 +2,7 @@ package com.epam.esm.purchase.service;
 
 import com.epam.esm.certificate.models.Certificate;
 import com.epam.esm.certificate.service.CertificateService;
-import com.epam.esm.model.UserDTO;
+import com.epam.esm.model.AuthenticatedUser;
 import com.epam.esm.purchase.models.Purchase;
 import com.epam.esm.purchase.models.PurchaseCreationRequest;
 import com.epam.esm.purchase.models.PurchaseDTO;
@@ -18,6 +18,7 @@ import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchObjectException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.epam.esm.model.Role.ADMIN;
 import static com.epam.esm.utils.Constants.PURCHASE_DOES_NOT_EXISTS_ID;
 
 @Service
@@ -42,7 +44,8 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Transactional
     public PurchaseDTO create(PurchaseCreationRequest purchaseCreationRequest) {
         Map<Certificate, Integer> certificateQuantityMap = createCertificateQuantityMap(purchaseCreationRequest);
-        UserDTO user = (UserDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        AuthenticatedUser user =
+                (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Purchase savedPurchase = purchaseRepository.save(
                 Purchase.builder()
@@ -69,6 +72,15 @@ public class PurchaseServiceImpl implements PurchaseService {
     public PurchaseDTO getById(long id) {
         return purchaseRepository.findById(id).map(entityToDtoMapper::toPurchaseDTO)
                 .orElseThrow(() -> new NoSuchObjectException(String.format(PURCHASE_DOES_NOT_EXISTS_ID, id)));
+    }
+
+    public Page<PurchaseDTO> getAllByUserId(long userId, Pageable pageable) {
+        AuthenticatedUser authenticatedUser =
+                (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(authenticatedUser.getId() == userId || authenticatedUser.getRole().equals(ADMIN))) {
+            throw new AccessDeniedException("ACCESS_DENIED");
+        }
+        return purchaseRepository.findAllByUserId(userId, pageable).map(entityToDtoMapper::toPurchaseDTO);
     }
 
     private Set<PurchaseCertificate> createPurchaseCertificateSet(Map<Certificate, Integer> certificateQuantityMap,
