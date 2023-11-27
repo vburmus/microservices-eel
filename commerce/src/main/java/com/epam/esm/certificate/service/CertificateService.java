@@ -20,13 +20,13 @@ public interface CertificateService {
 
     Page<CertificateDTO> getBySeveralTags(List<Long> tagsId, Pageable pageable);
 
-    Page<CertificateDTO> getByTagsAndShortDescriptionOrNamePart(List<Long> tagsId,
+    Page<CertificateDTO> getByTagsAndShortDescriptionOrNamePart(List<Long> tagIds,
                                                                 String part,
                                                                 Pageable pageable);
 
     Page<CertificateDTO> getByNameOrShortDescriptionPart(String part, Pageable pageable);
 
-    CertificateDTO updateCertificate(long id, JsonMergePatch jsonPatch, Optional<MultipartFile> image) throws JsonPatchException,
+    CertificateDTO update(long id, JsonMergePatch jsonPatch, Optional<MultipartFile> image) throws JsonPatchException,
             JsonProcessingException;
 
     void delete(Long id);

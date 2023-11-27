@@ -36,25 +36,9 @@ public class CertificateController {
         return ResponseEntity.ok(giftCertificateService.readAll(pageable));
     }
 
-    @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CertificateDTO> updateCertificate(
-            @PathVariable("id") long id,
-            @RequestPart(value = "patch") JsonMergePatch patch,
-            @RequestPart(value = "image") Optional<MultipartFile> image) throws JsonPatchException,
-            JsonProcessingException {
-        return ResponseEntity.ok(giftCertificateService.updateCertificate(id, patch, image));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<CertificateDTO> getById(@PathVariable("id") long id) {
         return ResponseEntity.ok(giftCertificateService.getById(id));
-    }
-
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") long id) {
-        giftCertificateService.delete(id);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping({"/search/by-tags"})
@@ -71,10 +55,25 @@ public class CertificateController {
     }
 
     @GetMapping({"/search/by-tags-and-part"})
-    public ResponseEntity<Page<CertificateDTO>> getByTagsAndShortDescription(@RequestParam("tagsId") List<Long> tagsId,
+    public ResponseEntity<Page<CertificateDTO>> getByTagsAndShortDescription(@RequestParam("tagIds") List<Long> tagIds,
                                                                              @RequestParam("part") String part,
                                                                              @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(giftCertificateService.getByTagsAndShortDescriptionOrNamePart(tagsId,
+        return ResponseEntity.ok(giftCertificateService.getByTagsAndShortDescriptionOrNamePart(tagIds,
                 part, pageable));
+    }
+
+    @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CertificateDTO> updateCertificate(
+            @PathVariable("id") long id,
+            @RequestPart(value = "patch") JsonMergePatch patch,
+            @RequestPart(value = "image") Optional<MultipartFile> image) throws JsonPatchException,
+            JsonProcessingException {
+        return ResponseEntity.ok(giftCertificateService.update(id, patch, image));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") long id) {
+        giftCertificateService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
