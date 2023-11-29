@@ -63,6 +63,16 @@ public class RestExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
+    @ExceptionHandler({InvalidFileException.class, NullableFileException.class, ImageUploadException.class})
+    public ResponseEntity<Problem> handleInvalidFileException(InvalidFileException e) {
+        Problem problem = Problem.builder()
+                .withStatus(Status.UNPROCESSABLE_ENTITY)
+                .withTitle(FILE_UPLOAD_ERROR)
+                .withDetail(e.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(problem);
+    }
+
     private Problem buildProblem(Status status, String title, String detail) {
         return Problem.builder()
                 .withStatus(status)

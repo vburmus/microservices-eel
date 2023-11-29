@@ -10,6 +10,7 @@ import com.epam.esm.jwt.service.JwtService;
 import com.epam.esm.jwt.service.TokenGenerator;
 import com.epam.esm.model.AuthenticatedUser;
 import com.epam.esm.utils.EntityToDtoMapper;
+import com.epam.esm.utils.Validation;
 import com.epam.esm.utils.amqp.CreateUserRequest;
 import com.epam.esm.utils.amqp.EmailValidationMessage;
 import com.epam.esm.utils.amqp.ImageUploadRequest;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+import static com.epam.esm.utils.Constants.INVALID_FILE_CHECK_BYTES;
 import static com.epam.esm.utils.Constants.MISSING_USER_EMAIL;
 
 @Service
@@ -49,7 +51,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } else {
             credentials = credentialsService.create(request);
             createUser(request, credentials);
-            uploadUserImage(image, credentials.getId());
+            if (image != null) {
+                uploadUserImage(image, credentials.getId());
+            }
         }
         String token = tokenGenerator.createValidationToken(credentials);
         String verificationLink = verificationUrl + token;
@@ -78,14 +82,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private void uploadUserImage(MultipartFile image, Long id) {
-        if (!image.isEmpty()) {
-            try {
-                byte[] imageBytes = image.getBytes();
-                ImageUploadRequest icr = new ImageUploadRequest(imageBytes, id);
-                messagePublisher.publishImage(icr);
-            } catch (IOException e) {
-                throw new ImageUploadException(e.getMessage());
-            }
+        Validation.validateImage(image);
+        try {
+            byte[] imageBytes = image.getBytes();
+            ImageUploadRequest icr = new ImageUploadRequest(imageBytes, id);
+            messagePublisher.publishImage(icr);
+        } catch (IOException e) {
+            throw new ImageUploadException(INVALID_FILE_CHECK_BYTES);
         }
     }
 
