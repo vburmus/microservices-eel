@@ -47,8 +47,7 @@ public class SecurityConfig {
                                         "/api/v1/purchases").hasAnyAuthority(USER)
                                 .requestMatchers(
                                         HttpMethod.POST,
-                                        "/api/v1/certificates",
-                                        "/api/v1/tags").hasAnyAuthority(ADMIN)
+                                        "/api/v1/**").hasAnyAuthority(ADMIN)
                                 .requestMatchers(
                                         HttpMethod.PATCH,
                                         "/api/v1/**").hasAuthority(ADMIN)
