@@ -3,6 +3,7 @@ package com.epam.esm.tag.service;
 
 import com.epam.esm.tag.models.Tag;
 import com.epam.esm.tag.models.TagDTO;
+import com.epam.esm.utils.amqp.ImageUploadResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
@@ -27,4 +28,6 @@ public interface TagService {
             JsonProcessingException;
 
     List<Tag> checkTagsAndFetch(List<Tag> tags);
+
+    void setUploadedImage(ImageUploadResponse response);
 }

@@ -141,6 +141,15 @@ public class CertificateServiceImpl implements CertificateService {
         certificate.setLongDescription(updatedCertificate.getLongDescription());
     }
 
+    @Override
+    public void setUploadedImage(ImageUploadResponse response) {
+        Certificate certificate = certificateRepository.findById(response.id())
+                .orElseThrow(() -> new NoSuchObjectException(String.format(CERTIFICATE_DOES_NOT_EXISTS_ID,
+                        response.id())));
+        certificate.setImageUrl(response.imageUrl());
+        certificateRepository.save(certificate);
+    }
+
     private boolean ifExist(Certificate certificate) {
         ExampleMatcher gcMatcher = ExampleMatcher.matching()
                 .withIgnorePaths(CREATE_DATE, LAST_UPDATE, ID, PRICE)

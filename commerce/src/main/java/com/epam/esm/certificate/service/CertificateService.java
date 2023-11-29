@@ -30,4 +30,6 @@ public interface CertificateService {
             JsonProcessingException;
 
     void delete(Long id);
+
+    void setUploadedImage(ImageUploadResponse response);
 }

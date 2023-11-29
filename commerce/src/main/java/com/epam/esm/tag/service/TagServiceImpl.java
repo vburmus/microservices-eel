@@ -109,6 +109,14 @@ public class TagServiceImpl implements TagService {
         return fetchedTags;
     }
 
+    @Override
+    public void setUploadedImage(ImageUploadResponse response) {
+        Tag tag = tagRepository.findById(response.id())
+                .orElseThrow(() -> new NoSuchObjectException(String.format(TAG_DOESNT_EXIST_ID, response.id())));
+        tag.setImageUrl(response.imageUrl());
+        tagRepository.save(tag);
+    }
+
     private Tag getByName(String name) {
         return tagRepository.findByName(name)
                 .orElseThrow(() -> new NoSuchObjectException(String.format(TAG_DOESNT_EXIST_NAME, name)));
