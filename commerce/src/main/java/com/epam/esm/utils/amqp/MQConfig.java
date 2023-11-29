@@ -21,21 +21,63 @@ public class MQConfig {
     @Value("${purchase.exchange}")
     private String purchaseExchange;
     @Value("${purchase.key}")
-    private String routingKey;
+    private String purchaseRoutingKey;
+    @Value("${certificate.image.queue}")
+    private String certificateImageQueue;
+    @Value("${certificate.image.exchange}")
+    private String certificateImageExchange;
+    @Value("${certificate.image.key}")
+    private String certificateImageRoutingKey;
+    @Value("${tag.image.queue}")
+    private String tagImageQueue;
+    @Value("${tag.image.exchange}")
+    private String tagImageExchange;
+    @Value("${tag.image.key}")
+    private String tagImageRoutingKey;
 
     @Bean
-    public Queue queue() {
+    public Queue purchaseQueue() {
         return new Queue(purchaseQueue);
     }
 
     @Bean
-    public TopicExchange exchange() {
+    public Queue certificateImageQueue() {
+        return new Queue(certificateImageQueue);
+    }
+
+    @Bean
+    public Queue tagImageQueue() {
+        return new Queue(tagImageQueue);
+    }
+
+    @Bean
+    public TopicExchange purchaseExchange() {
         return new TopicExchange(purchaseExchange);
     }
 
     @Bean
-    public Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(routingKey);
+    public TopicExchange certificateImageExchange() {
+        return new TopicExchange(certificateImageExchange);
+    }
+
+    @Bean
+    public TopicExchange tagImageExchange() {
+        return new TopicExchange(tagImageExchange);
+    }
+
+    @Bean
+    public Binding purchaseBinding(Queue purchaseQueue, TopicExchange purchaseExchange) {
+        return BindingBuilder.bind(purchaseQueue).to(purchaseExchange).with(purchaseRoutingKey);
+    }
+
+    @Bean
+    public Binding certificateImageBinding(Queue certificateImageQueue, TopicExchange certificateImageExchange) {
+        return BindingBuilder.bind(certificateImageQueue).to(certificateImageExchange).with(certificateImageRoutingKey);
+    }
+
+    @Bean
+    public Binding tagImageBinding(Queue tagImageQueue, TopicExchange tagImageExchange) {
+        return BindingBuilder.bind(tagImageQueue).to(tagImageExchange).with(tagImageRoutingKey);
     }
 
     @Bean

@@ -61,7 +61,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .email(user.getEmail())
                 .purchaseDTO(entityToDtoMapper.toPurchaseDTO(savedPurchase))
                 .build();
-        messagePublisher.publishMessage(message);
+        messagePublisher.publishPurchaseCreationMessage(message);
         return entityToDtoMapper.toPurchaseDTO(savedPurchase);
     }
 
