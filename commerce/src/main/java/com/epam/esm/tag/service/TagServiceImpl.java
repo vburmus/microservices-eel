@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.epam.esm.utils.Constants.*;
 
@@ -40,7 +39,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @Transactional
-    public TagDTO create(TagDTO tagDTO, Optional<MultipartFile> image) {
+    public TagDTO create(TagDTO tagDTO, MultipartFile image) {
         if (tagRepository.existsByName(tagDTO.name()))
             throw new ObjectAlreadyExists(String.format(TAG_ALREADY_EXISTS, tagDTO.name()));
         Tag tag = entityToDtoMapper.toTag(tagDTO);

@@ -16,8 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "api/v1/certificates")
@@ -27,8 +27,9 @@ public class CertificateController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CertificateDTO> create(@Valid @RequestPart("certificate") CertificateDTO certificateDTO,
-                                                 @RequestPart("image") Optional<MultipartFile> image) {
-        return ResponseEntity.ok(giftCertificateService.create(certificateDTO, image));
+                                                 @RequestPart(value = "image", required = false) MultipartFile image) {
+        CertificateDTO createdCertificate = giftCertificateService.create(certificateDTO, image);
+        return ResponseEntity.created(URI.create("/api/v1/tags/" + createdCertificate.id())).body(createdCertificate);
     }
 
     @GetMapping
@@ -66,7 +67,7 @@ public class CertificateController {
     public ResponseEntity<CertificateDTO> updateCertificate(
             @PathVariable("id") long id,
             @RequestPart(value = "patch") JsonMergePatch patch,
-            @RequestPart(value = "image") Optional<MultipartFile> image) throws JsonPatchException,
+            @RequestPart(value = "image", required = false) MultipartFile image) throws JsonPatchException,
             JsonProcessingException {
         return ResponseEntity.ok(giftCertificateService.update(id, patch, image));
     }

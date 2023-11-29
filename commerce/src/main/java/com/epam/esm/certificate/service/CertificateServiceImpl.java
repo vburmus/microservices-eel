@@ -44,7 +44,8 @@ public class CertificateServiceImpl implements CertificateService {
     private String defaultImageUrl;
 
     @Transactional
-    public CertificateDTO create(CertificateDTO giftCertificateDTO, Optional<MultipartFile> image) {
+    @Override
+    public CertificateDTO create(CertificateDTO giftCertificateDTO, MultipartFile image) {
         Certificate certificate = entityToDtoMapper.toCertificate(giftCertificateDTO);
         if (ifExist(certificate))
             throw new ObjectAlreadyExists(String.format(CERTIFICATE_EXISTS, certificate.getName(),
@@ -63,22 +64,26 @@ public class CertificateServiceImpl implements CertificateService {
         return entityToDtoMapper.toCertificateDTO(certificateRepository.save(certificate));
     }
 
+    @Override
     public Page<CertificateDTO> readAll(Pageable pageable) {
         Page<Certificate> allGCs = certificateRepository.findAll(pageable);
         return allGCs.map(entityToDtoMapper::toCertificateDTO);
     }
 
+    @Override
     public CertificateDTO getById(long id) {
         return certificateRepository.findById(id)
                 .map(entityToDtoMapper::toCertificateDTO)
                 .orElseThrow(() -> new NoSuchObjectException(String.format(CERTIFICATE_DOES_NOT_EXISTS_ID, id)));
     }
 
+    @Override
     public Page<CertificateDTO> getBySeveralTags(List<Long> tagsId, Pageable pageable) {
         return certificateRepository.findByTagsIdIn(tagsId, pageable)
                 .map(entityToDtoMapper::toCertificateDTO);
     }
 
+    @Override
     public Page<CertificateDTO> getByTagsAndShortDescriptionOrNamePart(List<Long> tagIds,
                                                                        String part,
                                                                        Pageable pageable) {
@@ -86,13 +91,15 @@ public class CertificateServiceImpl implements CertificateService {
                 part, pageable).map(entityToDtoMapper::toCertificateDTO);
     }
 
+    @Override
     public Page<CertificateDTO> getByNameOrShortDescriptionPart(String part, Pageable pageable) {
         return certificateRepository.findByPartialNameOrDescription(part, pageable)
                 .map(entityToDtoMapper::toCertificateDTO);
     }
 
     @Transactional
-    public CertificateDTO update(long id, JsonMergePatch jsonPatch, Optional<MultipartFile> image) throws JsonPatchException,
+    @Override
+    public CertificateDTO update(long id, JsonMergePatch jsonPatch, MultipartFile image) throws JsonPatchException,
             JsonProcessingException {
         Certificate certificate = certificateRepository.findById(id)
                 .orElseThrow(() -> new NoSuchObjectException(String.format(CERTIFICATE_DOES_NOT_EXISTS_ID, id)));
@@ -104,15 +111,7 @@ public class CertificateServiceImpl implements CertificateService {
         return entityToDtoMapper.toCertificateDTO(certificateRepository.save(certificate));
     }
 
-    private void mapUpdatedFields(Certificate certificate, Certificate updatedCertificate) {
-        certificate.setPrice(updatedCertificate.getPrice());
-        certificate.setName(updatedCertificate.getName());
-        certificate.setDurationDate(updatedCertificate.getDurationDate());
-        certificate.setTags(tagService.checkTagsAndFetch(updatedCertificate.getTags()));
-        certificate.setShortDescription(updatedCertificate.getShortDescription());
-        certificate.setLongDescription(updatedCertificate.getLongDescription());
-    }
-
+    @Override
     public void delete(Long id) {
         certificateRepository.findById(id).ifPresentOrElse(
                 certificate -> certificateRepository.deleteById(id),
@@ -120,6 +119,17 @@ public class CertificateServiceImpl implements CertificateService {
                     throw new NoSuchObjectException(String.format(TAG_DOESNT_EXIST_ID, id));
                 }
         );
+    }
+
+
+
+    private void mapUpdatedFields(Certificate certificate, Certificate updatedCertificate) {
+        certificate.setPrice(updatedCertificate.getPrice());
+        certificate.setName(updatedCertificate.getName());
+        certificate.setDurationDate(updatedCertificate.getDurationDate());
+        certificate.setTags(tagService.checkTagsAndFetch(updatedCertificate.getTags()));
+        certificate.setShortDescription(updatedCertificate.getShortDescription());
+        certificate.setLongDescription(updatedCertificate.getLongDescription());
     }
 
     private boolean ifExist(Certificate certificate) {

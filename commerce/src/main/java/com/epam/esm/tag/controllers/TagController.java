@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/tags")
@@ -26,7 +25,7 @@ public class TagController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<TagDTO> create(@Valid @RequestPart("tag") TagDTO tagDTO,
-                                         @RequestParam Optional<MultipartFile> image) {
+                                         @RequestPart(value = "image", required = false) MultipartFile image) {
         TagDTO createdTag = tagService.create(tagDTO, image);
         return ResponseEntity.created(URI.create("/api/v1/tags/" + createdTag.id())).body(createdTag);
     }

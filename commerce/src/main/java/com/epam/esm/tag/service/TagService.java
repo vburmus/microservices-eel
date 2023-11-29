@@ -11,10 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface TagService {
-    TagDTO create(TagDTO tagDTO, Optional<MultipartFile> image);
+    TagDTO create(TagDTO tagDTO, MultipartFile image);
 
     Page<TagDTO> readAll(Pageable pageable);
 
