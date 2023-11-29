@@ -6,10 +6,11 @@ import com.epam.esm.certificate.repository.CertificateRepository;
 import com.epam.esm.tag.models.Tag;
 import com.epam.esm.tag.service.TagService;
 import com.epam.esm.utils.EntityToDtoMapper;
-import com.epam.esm.utils.exceptionhandler.exceptions.UpdateException;
+import com.epam.esm.utils.amqp.ImageUploadResponse;
+import com.epam.esm.utils.amqp.MessagePublisher;
 import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchObjectException;
 import com.epam.esm.utils.exceptionhandler.exceptions.ObjectAlreadyExists;
-import com.epam.esm.utils.openfeign.AwsUtilsFeignClient;
+import com.epam.esm.utils.exceptionhandler.exceptions.UpdateException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static com.epam.esm.utils.Constants.*;
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.exact;
@@ -37,11 +37,15 @@ import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatc
 public class CertificateServiceImpl implements CertificateService {
     private final CertificateRepository certificateRepository;
     private final EntityToDtoMapper entityToDtoMapper;
-    private final AwsUtilsFeignClient awsClient;
+    private final MessagePublisher messagePublisher;
     private final TagService tagService;
     private final ObjectMapper objectMapper;
     @Value("${certificate.default.image.url}")
     private String defaultImageUrl;
+    @Value("${certificate.image.exchange}")
+    private String certificateImageExchange;
+    @Value("${certificate.image.key}")
+    private String certificateImageRoutingKey;
 
     @Transactional
     @Override
@@ -57,11 +61,13 @@ public class CertificateServiceImpl implements CertificateService {
 
         List<Tag> tags = certificate.getTags();
         certificate.setTags(tagService.checkTagsAndFetch(tags));
-        image.ifPresentOrElse(
-                img -> certificate.setImageUrl(awsClient.uploadImage(CERTIFICATES, img)),
-                () -> certificate.setImageUrl(defaultImageUrl)
-        );
-        return entityToDtoMapper.toCertificateDTO(certificateRepository.save(certificate));
+        certificate.setImageUrl(defaultImageUrl);
+        Certificate savedCertificate = certificateRepository.save(certificate);
+        if (image != null) {
+            messagePublisher.publishImageUploadMessage(image, savedCertificate.getId(), certificateImageExchange,
+                    certificateImageRoutingKey);
+        }
+        return entityToDtoMapper.toCertificateDTO(savedCertificate);
     }
 
     @Override
@@ -107,7 +113,10 @@ public class CertificateServiceImpl implements CertificateService {
         Certificate updatedCertificate = objectMapper.treeToValue(patched, Certificate.class);
         if (updatedCertificate == null) throw new UpdateException(UPDATE_CERTIFICATE_IS_NULL);
         mapUpdatedFields(certificate, updatedCertificate);
-        image.ifPresent(img -> certificate.setImageUrl(awsClient.uploadImage(CERTIFICATES, img)));
+        if (image != null) {
+            messagePublisher.publishImageUploadMessage(image, id, certificateImageExchange,
+                    certificateImageRoutingKey);
+        }
         return entityToDtoMapper.toCertificateDTO(certificateRepository.save(certificate));
     }
 
