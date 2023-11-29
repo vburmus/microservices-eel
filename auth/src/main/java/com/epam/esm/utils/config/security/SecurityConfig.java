@@ -30,8 +30,7 @@ public class SecurityConfig {
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(
                         request -> request
-                                .requestMatchers("/api/v1/auth/user",
-                                        "/api/v1/auth/delete-account/*").authenticated()
+                                .requestMatchers("/api/v1/auth/delete-account/*").authenticated()
                                 .anyRequest().permitAll());
         return http.build();
     }
