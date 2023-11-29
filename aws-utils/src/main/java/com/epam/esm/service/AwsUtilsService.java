@@ -36,21 +36,21 @@ public class AwsUtilsService {
     @Value("${aws.content.bucket.name}")
     private String bucketName;
 
-    public void loadByteImage(ImageUploadRequest imageUploadRequest, String directory) {
+    public void loadByteImage(ImageUploadRequest imageUploadRequest, Directory directory) {
         byte[] imageBytes = imageUploadRequest.imageBytes();
-        if (imageBytes == null || imageBytes.length == 0) {
+        if (imageBytes.length == 0) {
             throw new NullableFileException(FILE_CAN_T_BE_NULL);
         }
         try (ByteArrayInputStream imageInputStream = new ByteArrayInputStream(imageBytes)) {
             Regions region = Regions.EU_NORTH_1;
             AmazonS3 s3Client = createS3Client(region);
             ObjectMetadata metadata = createS3ObjectMetadata(imageBytes);
-            String objectKey = createS3ObjectKey(directory);
+            String objectKey = createS3ObjectKey(directory.getDir());
             s3Client.putObject(new PutObjectRequest(bucketName, objectKey, imageInputStream, metadata));
-            String imageURI = createS3ObjectUrl(region, objectKey);
+            String imageURL = createS3ObjectUrl(region, objectKey);
 
-            ImageUploadResponse imageUploadResponse = new ImageUploadResponse(imageUploadRequest.userId(), imageURI);
-            messagePublisher.publishLoadedImageResponse(imageUploadResponse);
+            ImageUploadResponse imageUploadResponse = new ImageUploadResponse(imageUploadRequest.id(), imageURL);
+            messagePublisher.publishLoadedImageResponse(imageUploadResponse, directory);
         } catch (AmazonS3Exception e) {
             throw new FileUploadException(e.getMessage(), e.getStatusCode());
         } catch (IOException e) {
@@ -78,6 +78,6 @@ public class AwsUtilsService {
 
     private String createS3ObjectKey(String directory) {
         String imageId = UUID.randomUUID().toString();
-        return directory + "/" + imageId + "." + EXTENSION;
+        return directory + "/" + imageId + EXTENSION;
     }
 }

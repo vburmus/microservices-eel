@@ -24,20 +24,60 @@ public class MQConfig {
     private String userImageResponseExchange;
     @Value("${user.image.response.key}")
     private String userImageResponseRoutingKey;
+    @Value("${certificate.image.response.queue}")
+    private String certificateImageResponseQueue;
+    @Value("${certificate.image.response.exchange}")
+    private String certificateImageResponseExchange;
+    @Value("${certificate.image.response.key}")
+    private String certificateImageResponseRoutingKey;
+    @Value("${tag.image.response.queue}")
+    private String tagImageResponseQueue;
+    @Value("${tag.image.response.exchange}")
+    private String tagImageResponseExchange;
+    @Value("${tag.image.response.key}")
+    private String tagImageResponseRoutingKey;
 
     @Bean
-    public Queue userImageQueue() {
+    public Queue userImageResponseQueue() {
         return new Queue(userImageResponseQueue);
     }
 
     @Bean
-    public TopicExchange imageUploadExchange() {
+    public Queue certificateImageResponseQueue() {
+        return new Queue(certificateImageResponseQueue);
+    }
+
+    @Bean
+    public Queue tagImageResponseQueue() {
+        return new Queue(tagImageResponseQueue);
+    }
+
+    @Bean
+    public TopicExchange userImageUploadExchange() {
         return new TopicExchange(userImageResponseExchange);
     }
 
     @Bean
-    public Binding imageUploadBinding(Queue userImageQueue, TopicExchange imageUploadExchange) {
-        return BindingBuilder.bind(userImageQueue).to(imageUploadExchange).with(userImageResponseRoutingKey);
+    public TopicExchange certificateImageUploadExchange() {
+        return new TopicExchange(certificateImageResponseExchange);
+    }
+
+    @Bean
+    public TopicExchange tagImageUploadExchange() {
+        return new TopicExchange(tagImageResponseExchange);
+    }
+
+    @Bean
+    public Binding userImageUploadBinding(Queue userImageResponseQueue, TopicExchange userImageUploadExchange) {
+        return BindingBuilder.bind(userImageResponseQueue).to(userImageUploadExchange).with(userImageResponseRoutingKey);
+    }
+    @Bean
+    public Binding certificateImageUploadBinding(Queue certificateImageResponseQueue, TopicExchange certificateImageUploadExchange) {
+        return BindingBuilder.bind(certificateImageResponseQueue).to(certificateImageUploadExchange).with(certificateImageResponseRoutingKey);
+    }
+    @Bean
+    public Binding tagImageUploadBinding(Queue tagImageResponseQueue, TopicExchange tagImageUploadExchange) {
+        return BindingBuilder.bind(tagImageResponseQueue).to(tagImageUploadExchange).with(tagImageResponseRoutingKey);
     }
 
     @Bean
