@@ -3,7 +3,7 @@ plugins {
     kotlin("plugin.spring") version "1.8.0"
     id("com.google.cloud.tools.jib") version "3.4.0"
 }
-project.version = 1.0
+project.version = 1.1
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")

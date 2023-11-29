@@ -13,7 +13,7 @@ class MessageListener(val emailService: EmailService) {
         emailService.sendOrderConfirmationEmail(message.email, message.purchaseDTO)
     }
 
-    @RabbitListener(queues = ["\${user.queue}"])
+    @RabbitListener(queues = ["\${user.validation.queue}"])
     fun onUserRegister(message: EmailValidationMessage) {
         emailService.sendEmailVerificationEmail(message.email, message.activationUrl)
     }
