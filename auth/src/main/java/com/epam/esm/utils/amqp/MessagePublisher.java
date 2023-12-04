@@ -38,7 +38,7 @@ public class MessagePublisher {
         template.convertAndSend(userCreationExchange, userCreationRoutingKey, request);
     }
 
-    public void publishImage(ImageUploadRequest request) {
+    public void publishUserImage(ImageUploadRequest request) {
         template.convertAndSend(userImageExchange, userImageRoutingKey, request);
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class MQConfig {
     private final ObjectMapper objectMapper;
+
     @Value("${purchase.queue}")
     private String purchaseQueue;
     @Value("${purchase.exchange}")

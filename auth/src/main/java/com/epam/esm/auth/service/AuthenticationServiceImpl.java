@@ -86,7 +86,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             byte[] imageBytes = image.getBytes();
             ImageUploadRequest icr = new ImageUploadRequest(imageBytes, id);
-            messagePublisher.publishImage(icr);
+            messagePublisher.publishUserImage(icr);
         } catch (IOException e) {
             throw new ImageUploadException(INVALID_FILE_CHECK_BYTES);
         }

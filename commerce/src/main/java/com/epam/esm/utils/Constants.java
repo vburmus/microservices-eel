@@ -13,7 +13,6 @@ public class Constants {
     public static final String NO_SUCH_ITEM_ERROR = "No Such Item Error";
     public static final String TAG_ALREADY_EXISTS = "Tag with name %s already exists";
     public static final String TAG_DOESNT_EXIST_ID = "Tag with id %d doesn't exist";
-    public static final String TAGS = "tags";
     public static final String CERTIFICATE_EXISTS = "Certificate with name %s and duration %s exist";
     public static final String CERTIFICATE_DOES_NOT_EXISTS_ID = "Certificate with id %d " +
             "doesn't exist";
@@ -25,7 +24,6 @@ public class Constants {
     public static final String SHORT_DESCRIPTION = "short_description";
     public static final String DURATION_DATE = "duration_date";
     public static final String SORT_PARAMETER_ERROR = "Sort Parameter Error";
-    public static final String CERTIFICATES = "certificates";
     public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
     public static final String TAG_DOESNT_EXIST_NAME = "Tag with name %s doesn't exist";
     public static final String UPDATE_CERTIFICATE_IS_NULL = "Error updating certificate. Updated certificate is null.";
@@ -64,5 +62,4 @@ public class Constants {
     public static final String FILE_CAN_T_BE_NULL = "File can't be null";
     public static final String INVALID_FILE_CHECK_BYTES = "Invalid file, check bytes";
     public static final String FILE_UPLOAD_ERROR = "File Upload Error";
-
 }

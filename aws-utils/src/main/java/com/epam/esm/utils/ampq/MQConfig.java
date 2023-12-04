@@ -71,10 +71,13 @@ public class MQConfig {
     public Binding userImageUploadBinding(Queue userImageResponseQueue, TopicExchange userImageUploadExchange) {
         return BindingBuilder.bind(userImageResponseQueue).to(userImageUploadExchange).with(userImageResponseRoutingKey);
     }
+
     @Bean
-    public Binding certificateImageUploadBinding(Queue certificateImageResponseQueue, TopicExchange certificateImageUploadExchange) {
+    public Binding certificateImageUploadBinding(Queue certificateImageResponseQueue,
+                                                 TopicExchange certificateImageUploadExchange) {
         return BindingBuilder.bind(certificateImageResponseQueue).to(certificateImageUploadExchange).with(certificateImageResponseRoutingKey);
     }
+
     @Bean
     public Binding tagImageUploadBinding(Queue tagImageResponseQueue, TopicExchange tagImageUploadExchange) {
         return BindingBuilder.bind(tagImageResponseQueue).to(tagImageUploadExchange).with(tagImageResponseRoutingKey);

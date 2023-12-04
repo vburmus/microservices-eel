@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 import static com.epam.esm.utils.AuthConstants.*;
+import static com.epam.esm.utils.Constants.TOKEN_EXPIRED;
 
 @RequiredArgsConstructor
 @Component
@@ -54,7 +55,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             JsonObject errorJson = new JsonObject();
             errorJson.addProperty(TITLE, AUTHENTICATION_EXCEPTION);
             errorJson.addProperty(STATUS, HttpServletResponse.SC_UNAUTHORIZED);
-            errorJson.addProperty(DETAIL, "Token expired");
+            errorJson.addProperty(DETAIL, TOKEN_EXPIRED);
             response.getWriter().write(errorJson.toString());
         }
     }

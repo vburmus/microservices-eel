@@ -28,7 +28,6 @@ public class CredentialsServiceImpl implements CredentialsService {
     private final JwtService jwtService;
     private final MessagePublisher messagePublisher;
 
-
     @Override
     public Credentials create(RegisterRequest request) {
         credentialsRepository.findByEmail(request.email()).ifPresent(req -> {

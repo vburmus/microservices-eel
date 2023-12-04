@@ -9,8 +9,6 @@ public class Constants {
     public static final String ID = "id";
     public static final String ROLE = "role";
     public static final String EPAM = "epam";
-    public static final String NAME = "name";
-    public static final String SURNAME = "surname";
     public static final String TYPE = "type";
     public static final String ACCESS_TOKENS = "accessTokens";
     public static final String REFRESH_TOKENS = "refreshTokens";
@@ -46,5 +44,5 @@ public class Constants {
     public static final String FILE_CAN_T_BE_NULL = "File can't be null";
     public static final String INVALID_FILE_CHECK_BYTES = "Invalid file, check bytes";
     public static final String FILE_UPLOAD_ERROR = "File Upload Error";
-
+    public static final String TOKEN_EXPIRED = "Token expired";
 }

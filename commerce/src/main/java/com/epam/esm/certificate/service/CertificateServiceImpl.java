@@ -130,7 +130,14 @@ public class CertificateServiceImpl implements CertificateService {
         );
     }
 
-
+    @Override
+    public void setUploadedImage(ImageUploadResponse response) {
+        Certificate certificate = certificateRepository.findById(response.id())
+                .orElseThrow(() -> new NoSuchObjectException(String.format(CERTIFICATE_DOES_NOT_EXISTS_ID,
+                        response.id())));
+        certificate.setImageUrl(response.imageUrl());
+        certificateRepository.save(certificate);
+    }
 
     private void mapUpdatedFields(Certificate certificate, Certificate updatedCertificate) {
         certificate.setPrice(updatedCertificate.getPrice());
@@ -139,15 +146,6 @@ public class CertificateServiceImpl implements CertificateService {
         certificate.setTags(tagService.checkTagsAndFetch(updatedCertificate.getTags()));
         certificate.setShortDescription(updatedCertificate.getShortDescription());
         certificate.setLongDescription(updatedCertificate.getLongDescription());
-    }
-
-    @Override
-    public void setUploadedImage(ImageUploadResponse response) {
-        Certificate certificate = certificateRepository.findById(response.id())
-                .orElseThrow(() -> new NoSuchObjectException(String.format(CERTIFICATE_DOES_NOT_EXISTS_ID,
-                        response.id())));
-        certificate.setImageUrl(response.imageUrl());
-        certificateRepository.save(certificate);
     }
 
     private boolean ifExist(Certificate certificate) {
