@@ -8,13 +8,15 @@ import com.epam.esm.credentials.service.CredentialsService;
 import com.epam.esm.credentials.service.CustomUserCredentialsService;
 import com.epam.esm.jwt.service.JwtService;
 import com.epam.esm.jwt.service.TokenGenerator;
-import com.epam.esm.model.Role;
-import com.epam.esm.model.UserDTO;
+import com.epam.esm.model.AuthenticatedUser;
 import com.epam.esm.utils.EntityToDtoMapper;
+import com.epam.esm.utils.Validation;
+import com.epam.esm.utils.amqp.CreateUserRequest;
 import com.epam.esm.utils.amqp.EmailValidationMessage;
+import com.epam.esm.utils.amqp.ImageUploadRequest;
 import com.epam.esm.utils.amqp.MessagePublisher;
 import com.epam.esm.utils.exceptionhandler.exceptions.EmailNotFoundException;
-import com.epam.esm.utils.openfeign.UserFeignClient;
+import com.epam.esm.utils.exceptionhandler.exceptions.ImageUploadException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
+import static com.epam.esm.utils.Constants.INVALID_FILE_CHECK_BYTES;
 import static com.epam.esm.utils.Constants.MISSING_USER_EMAIL;
 
 @Service
@@ -31,7 +36,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final TokenGenerator tokenGenerator;
     private final JwtService jwtService;
-    private final UserFeignClient userClient;
     private final CredentialsService credentialsService;
     private final EntityToDtoMapper entityToDtoMapper;
     private final CustomUserCredentialsService userDetailsService;
@@ -40,51 +44,61 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private String verificationUrl;
 
     @Transactional
+    @Override
     public String register(RegisterRequest request, MultipartFile image) {
         Credentials credentials;
-        UserDTO user;
-        try {
+        if (credentialsService.existsByEmail(request.email())) {
             credentials = credentialsService.getByEmail(request.email());
-            user = userClient.getByEmail(credentials.getUsername());
-        } catch (EmailNotFoundException e) {
+        } else {
             credentials = credentialsService.create(request);
-            user = userClient.create(entityToDtoMapper.toUserCreationRequest(request), image);
-            user.setRole(Role.USER);
+            createUser(request, credentials);
+            if (image != null) {
+                uploadUserImage(image, credentials.getId());
+            }
         }
-        String token = tokenGenerator.createValidationToken(user);
-        EmailValidationMessage evm = EmailValidationMessage.builder()
-                .email(credentials.getUsername())
-                .activationUrl(verificationUrl + "?token=" + token)
-                .build();
+        String token = tokenGenerator.createValidationToken(credentials);
+        String verificationLink = verificationUrl + token;
+        EmailValidationMessage evm = new EmailValidationMessage(credentials.getUsername(), verificationLink);
         messagePublisher.publishValidateEmailMessage(evm);
         return token;
     }
 
+    @Override
     public TokenDTO authenticate(AuthenticationRequest request) {
-        UserDTO user = userClient.getByEmail(request.email());
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(),
                 request.password()));
         Credentials credentials = userDetailsService.loadUserByUsername(request.email());
-        user.setRole(credentials.getRole());
-        return tokenGenerator.createToken(user);
+        return tokenGenerator.createToken(credentials);
     }
 
+    @Override
     public String refreshToken(String jwt) {
-        UserDTO user = getUserFromJwt(jwt);
-        return tokenGenerator.createAccessToken(user);
+        String email = jwtService.extractUsername(jwt);
+        Credentials credentials = userDetailsService.loadUserByUsername(email);
+        return tokenGenerator.createAccessToken(credentials);
     }
 
-    public UserDTO decodeUserFromJwt(String jwt) {
-        UserDTO user = getUserFromJwt(jwt);
-        Credentials credentials = userDetailsService.loadUserByUsername(user.getEmail());
-        user.setRole(credentials.getRole());
-        user.setProvider(credentials.getProvider());
-        return user;
-    }
-
-    private UserDTO getUserFromJwt(String jwt) {
+    @Override
+    public AuthenticatedUser decodeUserFromJwt(String jwt) {
         String email = jwtService.extractUsername(jwt);
         if (email == null) throw new EmailNotFoundException(MISSING_USER_EMAIL);
-        return userClient.getByEmail(email);
+        return entityToDtoMapper.toAuthenticatedUser(credentialsService.getByEmail(email));
+    }
+
+    private void uploadUserImage(MultipartFile image, Long id) {
+        Validation.validateImage(image);
+        try {
+            byte[] imageBytes = image.getBytes();
+            ImageUploadRequest icr = new ImageUploadRequest(imageBytes, id);
+            messagePublisher.publishUserImage(icr);
+        } catch (IOException e) {
+            throw new ImageUploadException(INVALID_FILE_CHECK_BYTES);
+        }
+    }
+
+    private void createUser(RegisterRequest request, Credentials credentials) {
+        CreateUserRequest cur = entityToDtoMapper.toUserCreationRequest(request);
+        cur.setId(credentials.getId());
+        messagePublisher.publishUserCreationMessage(cur);
     }
 }

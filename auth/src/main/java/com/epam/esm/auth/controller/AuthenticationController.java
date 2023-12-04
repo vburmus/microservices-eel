@@ -6,7 +6,7 @@ import com.epam.esm.auth.models.TokenDTO;
 import com.epam.esm.auth.service.AuthenticationService;
 import com.epam.esm.credentials.service.CredentialsService;
 import com.epam.esm.jwt.service.JwtService;
-import com.epam.esm.model.UserDTO;
+import com.epam.esm.model.AuthenticatedUser;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +59,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<UserDTO> getUserFromJwt(@RequestHeader(AUTHORIZATION_HEADER) String bearerToken) {
+    public ResponseEntity<AuthenticatedUser> getUserFromJwt(@RequestHeader(AUTHORIZATION_HEADER) String bearerToken) {
         jwtService.validateToken(bearerToken);
         return ResponseEntity.ok(authenticationService.decodeUserFromJwt(bearerToken.substring(7)));
     }

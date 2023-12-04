@@ -1,0 +1,278 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+  rabbitmq:
+    image: rabbitmq:3.9.11-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+  configuration-server:
+    image: vburmus/config-server:1.0
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    depends_on:
+      - zipkin
+    environment:
+      ZIPKIN_URI: http://zipkin:9411
+      GIT_USER: ${GIT_USER}
+      CONFIG_REPOSITORY: ${CONFIG_REPOSITORY}
+      GIT_PASSWORD: ${GIT_PASSWORD}
+    restart: on-failure:5
+    networks:
+      - microservices-net
+    mem_limit: 128m
+  eureka-server:
+    image: vburmus/eureka-server:1.0
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    depends_on:
+      - configuration-server
+      - zipkin
+    environment:
+      ZIPKIN_URI: http://zipkin:9411
+      CONFIGURATION_SERVER_URI: http://configuration-server:8888/
+    restart: on-failure:5
+    networks:
+      - microservices-net
+    mem_limit: 256m
+  api-gateway:
+    image: vburmus/api-gateway:1.0
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+      - configuration-server
+      - zipkin
+    environment:
+      ZIPKIN_URI: http://zipkin:9411
+      EUREKA_URI: http://eureka-server:8761/eureka
+      CONFIGURATION_SERVER_URI: http://configuration-server:8888/
+      ALLOWED_ORIGIN: ${ALLOWED_ORIGIN}
+    restart: on-failure:5
+    networks:
+      - microservices-net
+    mem_limit: 128m
+  auth:
+    image: vburmus/auth:1.1
+    container_name: auth-service
+    ports:
+      - "9001:9001"
+    depends_on:
+      - eureka-server
+      - configuration-server
+      - postgres
+      - rabbitmq
+      - zipkin
+      - api-gateway
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka
+      ZIPKIN_URI: http://zipkin:9411
+      CONFIGURATION_SERVER_URI: http://configuration-server:8888/
+      JWT_SECRET: ${JWT_SECRET}
+      RABBIT_PASSWORD: ${RABBIT_PASSWORD}
+      RABBIT_URI: rabbitmq:5672
+      RABBIT_USER: ${RABBIT_USER}
+      SQL_PASSWORD: ${SQL_PASSWORD}
+      SQL_URI: jdbc:postgresql://postgres:5432/auth
+      SQL_USERNAME: ${SQL_USERNAME}
+      USER_DELETION_EXCHANGE: ${USER_DELETION_EXCHANGE}
+      USER_DELETION_KEY: ${USER_DELETION_KEY}
+      USER_QUEUE: ${USER_QUEUE}
+      USER_VALIDATION_EXCHANGE: ${USER_VALIDATION_EXCHANGE}
+      USER_VALIDATION_KEY: ${USER_VALIDATION_KEY}
+      VERIFICATION_ADDRESS: http://localhost:3000/activate-account?token=
+      IMAGE_UPLOAD_EXCHANGE: ${IMAGE_UPLOAD_EXCHANGE}
+      IMAGE_UPLOAD_KEY: ${IMAGE_UPLOAD_KEY}
+      USER_DELETION_QUEUE: ${USER_DELETION_QUEUE}
+      USER_CREATION_QUEUE: ${USER_CREATION_QUEUE}
+      USER_CREATION_EXCHANGE: ${USER_CREATION_EXCHANGE}
+      USER_CREATION_KEY: ${USER_CREATION_KEY}
+      USER_VALIDATION_QUEUE: ${USER_VALIDATION_QUEUE}
+      USER_IMAGE_QUEUE: ${USER_IMAGE_QUEUE}
+      USER_IMAGE_EXCHANGE: ${USER_IMAGE_EXCHANGE}
+      USER_IMAGE_KEY: ${USER_IMAGE_KEY}
+    restart: on-failure:5
+    networks:
+      - microservices-net
+    mem_limit: 256m
+  user:
+    image: vburmus/user:1.1
+    container_name: user-service
+    ports:
+      - "9002:9002"
+    depends_on:
+      - eureka-server
+      - postgres
+      - rabbitmq
+      - configuration-server
+      - zipkin
+      - api-gateway
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka
+      ZIPKIN_URI: http://zipkin:9411
+      CONFIGURATION_SERVER_URI: http://configuration-server:8888/
+      RABBIT_PASSWORD: ${RABBIT_PASSWORD}
+      RABBIT_URI: rabbitmq:5672
+      RABBIT_USER: ${RABBIT_USER}
+      SQL_PASSWORD: ${SQL_PASSWORD}
+      SQL_URI: jdbc:postgresql://postgres:5432/user
+      SQL_USERNAME: ${SQL_USERNAME}
+      USER_QUEUE: ${USER_QUEUE}
+      USER_DEFAULT_IMAGE_URL: ${USER_DEFAULT_IMAGE_URL}
+      USER_CREATION_QUEUE: ${USER_CREATION_QUEUE}
+      USER_DELETION_QUEUE: ${USER_DELETION_QUEUE}
+      USER_IMAGE_RESPONSE_QUEUE: ${USER_IMAGE_RESPONSE_QUEUE}
+    restart: on-failure:5
+    networks:
+      - microservices-net
+    mem_limit: 256m
+  aws-utils:
+    image: vburmus/aws-utils:1.1
+    container_name: aws-utils
+    ports:
+      - "9003:9003"
+    depends_on:
+      - eureka-server
+      - postgres
+      - rabbitmq
+      - configuration-server
+      - zipkin
+      - api-gateway
+    environment:
+      ZIPKIN_URI: http://zipkin:9411
+      AWS_ACCESS: ${AWS_ACCESS}
+      AWS_CONTENT_BUCKET: ${AWS_CONTENT_BUCKET}
+      AWS_SECRET: ${AWS_SECRET}
+      EUREKA_URI: http://eureka-server:8761/eureka
+      CONFIGURATION_SERVER_URI: http://configuration-server:8888/
+      USER_IMAGE_QUEUE: ${USER_IMAGE_QUEUE}
+      USER_IMAGE_RESPONSE_QUEUE: ${USER_IMAGE_RESPONSE_QUEUE}
+      USER_IMAGE_RESPONSE_EXCHANGE: ${USER_IMAGE_RESPONSE_EXCHANGE}
+      USER_IMAGE_RESPONSE_KEY: ${USER_IMAGE_RESPONSE_KEY}
+      CERTIFICATE_IMAGE_QUEUE: ${CERTIFICATE_IMAGE_QUEUE}
+      CERTIFICATE_IMAGE_RESPONSE_QUEUE: ${CERTIFICATE_IMAGE_RESPONSE_QUEUE}
+      CERTIFICATE_IMAGE_RESPONSE_EXCHANGE: ${CERTIFICATE_IMAGE_RESPONSE_EXCHANGE}
+      CERTIFICATE_IMAGE_RESPONSE_KEY: ${CERTIFICATE_IMAGE_RESPONSE_KEY}
+      TAG_IMAGE_QUEUE: ${TAG_IMAGE_QUEUE}
+      TAG_IMAGE_RESPONSE_QUEUE: ${TAG_IMAGE_RESPONSE_QUEUE}
+      TAG_IMAGE_RESPONSE_EXCHANGE: ${TAG_IMAGE_RESPONSE_EXCHANGE}
+      TAG_IMAGE_RESPONSE_KEY: ${TAG_IMAGE_RESPONSE_KEY}
+      RABBIT_PASSWORD: ${RABBIT_PASSWORD}
+      RABBIT_URI: rabbitmq:5672
+      RABBIT_USER: ${RABBIT_USER}
+    restart: on-failure:5
+    networks:
+      - microservices-net
+    mem_limit: 128m
+  commerce:
+    image: vburmus/commerce:1.1
+    container_name: commerce-service
+    ports:
+      - "9004:9004"
+    environment:
+      ZIPKIN_URI: http://zipkin:9411
+      CERTIFICATE_DEFAULT_IMAGE_URL: ${CERTIFICATE_DEFAULT_IMAGE_URL}
+      EUREKA_URI: http://eureka-server:8761/eureka
+      PURCHASE_QUEUE: ${PURCHASE_QUEUE}
+      PURCHASE_EXCHANGE: ${PURCHASE_EXCHANGE}
+      PURCHASE_KEY:  ${PURCHASE_KEY}
+      SQL_PASSWORD: ${SQL_PASSWORD}
+      SQL_URI: jdbc:postgresql://postgres:5432/commerce
+      SQL_USERNAME: ${SQL_USERNAME}
+      TAG_DEFAULT_IMAGE_URL: ${TAG_DEFAULT_IMAGE_URL}
+      RABBIT_PASSWORD: ${RABBIT_PASSWORD}
+      RABBIT_URI: rabbitmq:5672
+      RABBIT_USER: ${RABBIT_USER}
+      CONFIGURATION_SERVER_URI: http://configuration-server:8888/
+      CERTIFICATE_IMAGE_QUEUE: ${CERTIFICATE_IMAGE_QUEUE}
+      CERTIFICATE_IMAGE_EXCHANGE: ${CERTIFICATE_IMAGE_EXCHANGE}
+      CERTIFICATE_IMAGE_KEY: ${CERTIFICATE_IMAGE_KEY}
+      TAG_IMAGE_QUEUE: ${TAG_IMAGE_QUEUE}
+      TAG_IMAGE_EXCHANGE: ${TAG_IMAGE_EXCHANGE}
+      TAG_IMAGE_KEY: ${TAG_IMAGE_KEY}
+      CERTIFICATE_IMAGE_RESPONSE_QUEUE: ${CERTIFICATE_IMAGE_RESPONSE_QUEUE}
+      TAG_IMAGE_RESPONSE_QUEUE: ${TAG_IMAGE_RESPONSE_QUEUE}
+    restart: on-failure:5
+    networks:
+      - microservices-net
+    mem_limit: 512m
+    depends_on:
+      - configuration-server
+      - eureka-server
+      - postgres
+      - rabbitmq
+      - zipkin
+      - api-gateway
+  notification:
+    image: vburmus/notification:1.1
+    container_name: notification-service
+    ports:
+      - "9005:9005"
+    environment:
+      ZIPKIN_URI: http://zipkin:9411
+      MAIL_ADDRESS: ${MAIL_ADDRESS}
+      MAIL_SECRET: ${MAIL_SECRET}
+      PURCHASE_QUEUE: ${PURCHASE_QUEUE}
+      RABBIT_PASSWORD: ${RABBIT_PASSWORD}
+      RABBIT_URI: rabbitmq:5672
+      RABBIT_USER: ${RABBIT_USER}
+      USER_VALIDATION_QUEUE: ${USER_VALIDATION_QUEUE}
+      CONFIGURATION_SERVER_URI: http://configuration-server:8888/
+    restart: on-failure:5
+    depends_on:
+      - configuration-server
+      - eureka-server
+      - rabbitmq
+      - zipkin
+      - api-gateway
+    networks:
+      - microservices-net
+    mem_limit: 128m
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:

@@ -11,4 +11,5 @@ public interface PurchaseService {
     Page<PurchaseDTO> readAll(Pageable pageable);
 
     PurchaseDTO getById(long id);
+    Page<PurchaseDTO> getAllByUserId(long userId, Pageable pageable);
 }

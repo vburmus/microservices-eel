@@ -17,6 +17,7 @@ import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 
 import static com.epam.esm.utils.Constants.*;
+import static com.epam.esm.utils.Constants.FILE_UPLOAD_ERROR;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -39,8 +40,8 @@ public class RestExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
-    @ExceptionHandler(CertificateUpdateException.class)
-    public ResponseEntity<Problem> handleCertificateUpdateException(CertificateUpdateException e) {
+    @ExceptionHandler(UpdateException.class)
+    public ResponseEntity<Problem> handleCertificateUpdateException(UpdateException e) {
         Problem problem = buildProblem(Status.BAD_REQUEST, UPDATE_ERROR, e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
@@ -69,6 +70,16 @@ public class RestExceptionHandler {
         String errorMessage = fieldError != null ? fieldError.getDefaultMessage() : INVALID_ITEM_ERROR;
         Problem problem = buildProblem(Status.BAD_REQUEST, INVALID_ITEM_ERROR, errorMessage);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
+    }
+
+    @ExceptionHandler({InvalidFileException.class, NullableFileException.class, ImageUploadException.class})
+    public ResponseEntity<Problem> handleInvalidFileException(InvalidFileException e) {
+        Problem problem = Problem.builder()
+                .withStatus(Status.UNPROCESSABLE_ENTITY)
+                .withTitle(FILE_UPLOAD_ERROR)
+                .withDetail(e.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(problem);
     }
 
     private Problem buildProblem(Status status, String title, String detail) {

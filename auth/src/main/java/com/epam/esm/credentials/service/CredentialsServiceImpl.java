@@ -28,7 +28,6 @@ public class CredentialsServiceImpl implements CredentialsService {
     private final JwtService jwtService;
     private final MessagePublisher messagePublisher;
 
-
     @Override
     public Credentials create(RegisterRequest request) {
         credentialsRepository.findByEmail(request.email()).ifPresent(req -> {
@@ -71,5 +70,10 @@ public class CredentialsServiceImpl implements CredentialsService {
                 credentialsRepository.findByEmail(email).orElseThrow(() -> new EmailNotFoundException(USER_NOT_EXIST_EMAIL));
         credentialsRepository.delete(credentials);
         messagePublisher.publishUserDeletionMessage(credentials.getUsername());
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return credentialsRepository.existsByEmail(email);
     }
 }

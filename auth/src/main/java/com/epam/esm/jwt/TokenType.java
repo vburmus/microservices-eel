@@ -5,16 +5,19 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 public enum TokenType {
-    ACCESS(Date.from(Instant.now().plus(60, ChronoUnit.MINUTES))),
-    REFRESH(Date.from(Instant.now().plus(2, ChronoUnit.DAYS))),
-    EMAIL_VALIDATION(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)));
-    private final Date expiryDate;
+    ACCESS(60, ChronoUnit.MINUTES),
+    REFRESH(2, ChronoUnit.DAYS),
+    EMAIL_VALIDATION(1, ChronoUnit.DAYS);
+    private final long duration;
+    private final ChronoUnit chronoUnit;
 
-    TokenType(Date expiryDate) {
-        this.expiryDate = expiryDate;
+    TokenType(long duration, ChronoUnit unit) {
+        this.duration = duration;
+        this.chronoUnit = unit;
     }
 
     public Date getExpiryDate() {
-        return expiryDate;
+        Instant expiryInstant = Instant.now().plus(duration, chronoUnit);
+        return Date.from(expiryInstant);
     }
 }

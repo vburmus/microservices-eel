@@ -17,25 +17,52 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MQConfig {
     private final ObjectMapper objectMapper;
-    @Value("${user.queue}")
-    private String userQueue;
 
+    @Value("${user.validation.queue}")
+    private String userValidationQueue;
     @Value("${user.validation.exchange}")
     private String emailValidationExchange;
-
     @Value("${user.validation.key}")
     private String emailValidationRoutingKey;
-
+    @Value("${user.deletion.queue}")
+    private String userDeletionQueue;
     @Value("${user.deletion.exchange}")
     private String userDeletionExchange;
-
     @Value("${user.deletion.key}")
     private String userDeletionRoutingKey;
+    @Value("${user.creation.queue}")
+    private String userCreationQueue;
+    @Value("${user.creation.exchange}")
+    private String userCreationExchange;
+    @Value("${user.creation.key}")
+    private String userCreationRoutingKey;
+    @Value("${user.image.queue}")
+    private String userImageQueue;
+    @Value("${user.image.exchange}")
+    private String userImageExchange;
+    @Value("${user.image.key}")
+    private String userImageRoutingKey;
 
     @Bean
-    public Queue queue() {
-        return new Queue(userQueue);
+    public Queue userCreationQueue() {
+        return new Queue(userCreationQueue);
     }
+
+    @Bean
+    public Queue userValidationQueue() {
+        return new Queue(userValidationQueue);
+    }
+
+    @Bean
+    public Queue userDeletionQueue() {
+        return new Queue(userDeletionQueue);
+    }
+
+    @Bean
+    public Queue userImageQueue() {
+        return new Queue(userImageQueue);
+    }
+
 
     @Bean
     public TopicExchange emailValidationExchange() {
@@ -48,13 +75,33 @@ public class MQConfig {
     }
 
     @Bean
-    public Binding emailValidationBinding(Queue queue, TopicExchange emailValidationExchange) {
-        return BindingBuilder.bind(queue).to(emailValidationExchange).with(emailValidationRoutingKey);
+    public TopicExchange userCreationExchange() {
+        return new TopicExchange(userCreationExchange);
     }
 
     @Bean
-    public Binding userDeletionBinding(Queue queue, TopicExchange userDeletionExchange) {
-        return BindingBuilder.bind(queue).to(userDeletionExchange).with(userDeletionRoutingKey);
+    public TopicExchange imageUploadExchange() {
+        return new TopicExchange(userImageExchange);
+    }
+
+    @Bean
+    public Binding emailValidationBinding(Queue userValidationQueue, TopicExchange emailValidationExchange) {
+        return BindingBuilder.bind(userValidationQueue).to(emailValidationExchange).with(emailValidationRoutingKey);
+    }
+
+    @Bean
+    public Binding userDeletionBinding(Queue userDeletionQueue, TopicExchange userDeletionExchange) {
+        return BindingBuilder.bind(userDeletionQueue).to(userDeletionExchange).with(userDeletionRoutingKey);
+    }
+
+    @Bean
+    public Binding userCreationBinding(Queue userCreationQueue, TopicExchange userCreationExchange) {
+        return BindingBuilder.bind(userCreationQueue).to(userCreationExchange).with(userCreationRoutingKey);
+    }
+
+    @Bean
+    public Binding imageUploadBinding(Queue userImageQueue, TopicExchange imageUploadExchange) {
+        return BindingBuilder.bind(userImageQueue).to(imageUploadExchange).with(userImageRoutingKey);
     }
 
     @Bean

@@ -1,16 +1,20 @@
 package com.epam.esm.service;
 
+import com.epam.esm.model.AuthenticatedUser;
 import com.epam.esm.model.Role;
-import com.epam.esm.model.UserDTO;
-import com.epam.esm.models.RegisterRequest;
 import com.epam.esm.models.User;
-import com.epam.esm.models.UserResponse;
+import com.epam.esm.models.UserDTO;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.utils.EntityToDtoMapper;
+import com.epam.esm.utils.Validation;
+import com.epam.esm.utils.ampq.CreateUserRequest;
+import com.epam.esm.utils.ampq.ImageUploadRequest;
+import com.epam.esm.utils.ampq.ImageUploadResponse;
+import com.epam.esm.utils.ampq.MessagePublisher;
+import com.epam.esm.utils.exceptionhandler.exceptions.ImageUploadException;
 import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchUserException;
 import com.epam.esm.utils.exceptionhandler.exceptions.UserAlreadyExistException;
 import com.epam.esm.utils.exceptionhandler.exceptions.UserUpdateException;
-import com.epam.esm.utils.openfeign.AwsUtilsFeignClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 import static com.epam.esm.utils.Constants.*;
 
 @Service
@@ -33,32 +39,41 @@ import static com.epam.esm.utils.Constants.*;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final EntityToDtoMapper entityToDtoMapper;
-    private final AwsUtilsFeignClient awsClient;
     private final ObjectMapper objectMapper;
+    private final MessagePublisher messagePublisher;
     @Value("${user.default.image.url}")
     private String defaultImageUrl;
 
     @Transactional
-    public UserResponse create(RegisterRequest registerRequest, MultipartFile image) {
-        userRepository.findByEmail(registerRequest.email()).ifPresent(user -> {
-            throw new UserAlreadyExistException(String.format(ALREADY_REGISTERED, registerRequest.email()));
+    @Override
+    public void create(CreateUserRequest registerRequest) {
+        userRepository.findByEmail(registerRequest.getEmail()).ifPresent(user -> {
+            throw new UserAlreadyExistException(String.format(ALREADY_REGISTERED, registerRequest.getEmail()));
         });
         User user = entityToDtoMapper.toUser(registerRequest);
-        user.setImageUrl(image == null ? defaultImageUrl : awsClient.uploadImage(USERS, image));
-        return entityToDtoMapper.toUserResponse(userRepository.save(user));
+        user.setImageUrl(defaultImageUrl);
+        userRepository.save(user);
     }
 
-    public Page<UserResponse> readAll(Pageable pageable) {
-        return userRepository.findAll(pageable).map(entityToDtoMapper::toUserResponse);
+    @Override
+    public Page<UserDTO> readAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(entityToDtoMapper::toUserDTO);
     }
 
-    public UserResponse getByEmail(String email) {
-        return userRepository.findByEmail(email).map(entityToDtoMapper::toUserResponse)
+    @Override
+    public UserDTO getByEmail(String email) {
+        return userRepository.findByEmail(email).map(entityToDtoMapper::toUserDTO)
                 .orElseThrow(() -> new NoSuchUserException(String.format(USER_DOESNT_EXIST_EMAIL, email)));
     }
 
+    @Override
+    public UserDTO getById(Long id) {
+        return userRepository.findById(id).map(entityToDtoMapper::toUserDTO)
+                .orElseThrow(() -> new NoSuchUserException(String.format(USER_DOESNT_EXIST_ID, id)));
+    }
+
     @Transactional
-    public UserResponse update(Long id, JsonMergePatch jsonPatch, MultipartFile image) throws JsonPatchException,
+    public UserDTO update(Long id, JsonMergePatch jsonPatch, MultipartFile image) throws JsonPatchException,
             JsonProcessingException {
         if (checkIfOperationRestricted(id)) {
             throw new AccessDeniedException(OPERATION_NOT_ALLOWED);
@@ -69,11 +84,13 @@ public class UserServiceImpl implements UserService {
         User updatedUser = objectMapper.treeToValue(patched, User.class);
         if (updatedUser == null) throw new UserUpdateException(UPDATE_USER_IS_NULL);
         mapUpdatedFields(user, updatedUser);
-        if (image != null) user.setImageUrl(awsClient.uploadImage(USERS, image));
-        return entityToDtoMapper.toUserResponse(userRepository.save(user));
-
+        if (image != null) {
+            uploadUserImage(image, id);
+        }
+        return entityToDtoMapper.toUserDTO(userRepository.save(user));
     }
 
+    @Override
     public void delete(String email) {
         userRepository.findByEmail(email).ifPresentOrElse(
                 user -> userRepository.deleteById(user.getId()),
@@ -83,8 +100,29 @@ public class UserServiceImpl implements UserService {
         );
     }
 
+    @Override
+    public void setUploadedImage(ImageUploadResponse imageUploadResponse) {
+        User user = userRepository.findById(imageUploadResponse.id())
+                .orElseThrow(() -> new NoSuchUserException(String.format(USER_DOESNT_EXIST_ID,
+                        imageUploadResponse.id())));
+        user.setImageUrl(imageUploadResponse.imageUrl());
+        userRepository.save(user);
+    }
+
+    private void uploadUserImage(MultipartFile image, Long id) {
+        Validation.validateImage(image);
+        try {
+            byte[] imageBytes = image.getBytes();
+            ImageUploadRequest icr = new ImageUploadRequest(imageBytes, id);
+            messagePublisher.publishUserImage(icr);
+        } catch (IOException e) {
+            throw new ImageUploadException(INVALID_FILE_CHECK_BYTES);
+        }
+    }
+
     private boolean checkIfOperationRestricted(Long id) {
-        UserDTO authenticatedUser = (UserDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        AuthenticatedUser authenticatedUser =
+                (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return !authenticatedUser.getId().equals(id) && !authenticatedUser.getRole().equals(Role.ADMIN);
     }
 
