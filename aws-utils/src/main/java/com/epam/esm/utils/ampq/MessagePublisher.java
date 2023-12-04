@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MessagePublisher {
     private final RabbitTemplate template;
+
     @Value("${user.image.response.exchange}")
     private String userImageExchange;
     @Value("${user.image.response.key}")

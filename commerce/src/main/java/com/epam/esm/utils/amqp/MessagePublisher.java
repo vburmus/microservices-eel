@@ -16,6 +16,7 @@ import static com.epam.esm.utils.Constants.INVALID_FILE_CHECK_BYTES;
 @Service
 public class MessagePublisher {
     private final RabbitTemplate template;
+
     @Value("${purchase.exchange}")
     private String purchaseExchange;
     @Value("${purchase.key}")

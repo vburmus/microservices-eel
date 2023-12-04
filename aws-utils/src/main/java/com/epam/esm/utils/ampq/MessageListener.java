@@ -4,9 +4,9 @@ import com.epam.esm.service.AwsUtilsService;
 import com.epam.esm.service.Directory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class MessageListener {
     private final AwsUtilsService awsUtilsService;
