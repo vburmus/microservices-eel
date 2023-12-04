@@ -1,8 +1,6 @@
 package com.epam.esm.utils.exceptionhandler;
 
-import com.epam.esm.utils.exceptionhandler.exceptions.NoSuchUserException;
-import com.epam.esm.utils.exceptionhandler.exceptions.UserAlreadyExistException;
-import com.epam.esm.utils.exceptionhandler.exceptions.UserUpdateException;
+import com.epam.esm.utils.exceptionhandler.exceptions.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatchException;
 import org.springframework.core.Ordered;
@@ -58,6 +56,16 @@ public class RestExceptionHandler {
         String errorMessage = fieldError != null ? fieldError.getDefaultMessage() : INVALID_USER_ERROR;
         Problem problem = buildProblem(Status.BAD_REQUEST, INVALID_USER_ERROR, errorMessage);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
+    }
+
+    @ExceptionHandler({InvalidFileException.class, NullableFileException.class, ImageUploadException.class})
+    public ResponseEntity<Problem> handleInvalidFileException(InvalidFileException e) {
+        Problem problem = Problem.builder()
+                .withStatus(Status.UNPROCESSABLE_ENTITY)
+                .withTitle(FILE_UPLOAD_ERROR)
+                .withDetail(e.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(problem);
     }
 
     private Problem buildProblem(Status status, String title, String detail) {
