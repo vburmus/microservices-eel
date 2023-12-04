@@ -1,6 +1,6 @@
 package com.epam.esm.service;
 
-import com.epam.esm.models.UserResponse;
+import com.epam.esm.models.UserDTO;
 import com.epam.esm.utils.ampq.CreateUserRequest;
 import com.epam.esm.utils.ampq.ImageUploadResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,13 +13,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
     void create(CreateUserRequest registerRequest);
-    Page<UserResponse> readAll(Pageable pageable);
+    Page<UserDTO> readAll(Pageable pageable);
 
-    UserResponse getByEmail(String email);
+    UserDTO getByEmail(String email);
 
-    UserResponse getById(Long id);
+    UserDTO getById(Long id);
 
-    UserResponse update(Long id, JsonMergePatch jsonPatch, MultipartFile image) throws JsonPatchException,
+    UserDTO update(Long id, JsonMergePatch jsonPatch, MultipartFile image) throws JsonPatchException,
             JsonProcessingException;
 
     void delete(String email);

@@ -1,6 +1,6 @@
 package com.epam.esm.controllers;
 
-import com.epam.esm.models.UserResponse;
+import com.epam.esm.models.UserDTO;
 import com.epam.esm.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatchException;
@@ -20,24 +20,23 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
     private final UserService userService;
 
-
     @GetMapping
-    public ResponseEntity<Page<UserResponse>> readAll(@PageableDefault Pageable pageable) {
+    public ResponseEntity<Page<UserDTO>> readAll(@PageableDefault Pageable pageable) {
         return ResponseEntity.ok(userService.readAll(pageable));
     }
 
     @GetMapping("/by-email")
-    public ResponseEntity<UserResponse> getByEmail(@RequestParam("email") String email) {
+    public ResponseEntity<UserDTO> getByEmail(@RequestParam("email") String email) {
         return ResponseEntity.ok(userService.getByEmail(email));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getById(@PathVariable("id") long id) {
+    public ResponseEntity<UserDTO> getById(@PathVariable("id") long id) {
         return ResponseEntity.ok(userService.getById(id));
     }
 
     @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserResponse> update(
+    public ResponseEntity<UserDTO> update(
             @PathVariable("id") long id,
             @RequestPart(value = "patch") JsonMergePatch patch,
             @RequestPart(value = "image", required = false) MultipartFile image) throws JsonPatchException,

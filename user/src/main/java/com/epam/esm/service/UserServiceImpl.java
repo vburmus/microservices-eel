@@ -3,7 +3,7 @@ package com.epam.esm.service;
 import com.epam.esm.model.AuthenticatedUser;
 import com.epam.esm.model.Role;
 import com.epam.esm.models.User;
-import com.epam.esm.models.UserResponse;
+import com.epam.esm.models.UserDTO;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.utils.EntityToDtoMapper;
 import com.epam.esm.utils.ampq.CreateUserRequest;
@@ -40,6 +40,7 @@ public class UserServiceImpl implements UserService {
     private String defaultImageUrl;
 
     @Transactional
+    @Override
     public void create(CreateUserRequest registerRequest) {
         userRepository.findByEmail(registerRequest.getEmail()).ifPresent(user -> {
             throw new UserAlreadyExistException(String.format(ALREADY_REGISTERED, registerRequest.getEmail()));
@@ -49,22 +50,25 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    public Page<UserResponse> readAll(Pageable pageable) {
-        return userRepository.findAll(pageable).map(entityToDtoMapper::toUserResponse);
+    @Override
+    public Page<UserDTO> readAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(entityToDtoMapper::toUserDTO);
     }
 
-    public UserResponse getByEmail(String email) {
-        return userRepository.findByEmail(email).map(entityToDtoMapper::toUserResponse)
+    @Override
+    public UserDTO getByEmail(String email) {
+        return userRepository.findByEmail(email).map(entityToDtoMapper::toUserDTO)
                 .orElseThrow(() -> new NoSuchUserException(String.format(USER_DOESNT_EXIST_EMAIL, email)));
     }
 
-    public UserResponse getById(Long id) {
-        return userRepository.findById(id).map(entityToDtoMapper::toUserResponse)
+    @Override
+    public UserDTO getById(Long id) {
+        return userRepository.findById(id).map(entityToDtoMapper::toUserDTO)
                 .orElseThrow(() -> new NoSuchUserException(String.format(USER_DOESNT_EXIST_ID, id)));
     }
 
     @Transactional
-    public UserResponse update(Long id, JsonMergePatch jsonPatch, MultipartFile image) throws JsonPatchException,
+    public UserDTO update(Long id, JsonMergePatch jsonPatch, MultipartFile image) throws JsonPatchException,
             JsonProcessingException {
         if (checkIfOperationRestricted(id)) {
             throw new AccessDeniedException(OPERATION_NOT_ALLOWED);
@@ -75,11 +79,10 @@ public class UserServiceImpl implements UserService {
         User updatedUser = objectMapper.treeToValue(patched, User.class);
         if (updatedUser == null) throw new UserUpdateException(UPDATE_USER_IS_NULL);
         mapUpdatedFields(user, updatedUser);
-        if (image != null) user.setImageUrl(awsClient.uploadImage(USERS, image));
-        return entityToDtoMapper.toUserResponse(userRepository.save(user));
-
+        return entityToDtoMapper.toUserDTO(userRepository.save(user));
     }
 
+    @Override
     public void delete(String email) {
         userRepository.findByEmail(email).ifPresentOrElse(
                 user -> userRepository.deleteById(user.getId()),

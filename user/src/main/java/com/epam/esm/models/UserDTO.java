@@ -1,6 +1,6 @@
 package com.epam.esm.models;
 
-public record UserResponse(
+public record UserDTO(
         Long id,
         String name,
         String surname,
