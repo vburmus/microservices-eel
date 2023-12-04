@@ -44,6 +44,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private String verificationUrl;
 
     @Transactional
+    @Override
     public String register(RegisterRequest request, MultipartFile image) {
         Credentials credentials;
         if (credentialsService.existsByEmail(request.email())) {
@@ -62,6 +63,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return token;
     }
 
+    @Override
     public TokenDTO authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(),
                 request.password()));
@@ -69,12 +71,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return tokenGenerator.createToken(credentials);
     }
 
+    @Override
     public String refreshToken(String jwt) {
         String email = jwtService.extractUsername(jwt);
         Credentials credentials = userDetailsService.loadUserByUsername(email);
         return tokenGenerator.createAccessToken(credentials);
     }
 
+    @Override
     public AuthenticatedUser decodeUserFromJwt(String jwt) {
         String email = jwtService.extractUsername(jwt);
         if (email == null) throw new EmailNotFoundException(MISSING_USER_EMAIL);
